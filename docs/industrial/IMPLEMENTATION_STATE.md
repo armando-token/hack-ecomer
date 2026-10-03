@@ -1,8 +1,8 @@
 # Project Implementation State Ledger
 
-**Current Gate:** `G1`  
-**Status:** `GATE_G1_COMPLETED`  
-**Last Updated:** `2026-10-03T20:46:00Z`  
+**Current Gate:** `G2`  
+**Status:** `GATE_G2_AWAITING_EXTERNAL_VERIFICATION`  
+**Last Updated:** `2026-10-03T20:59:00Z`  
 **Governing Document:** `docs/industrial/MEGAPLAN_MUSE_API_3D_V2.md`  
 
 ---
@@ -13,8 +13,8 @@
 |---|---|---|---|
 | **G0** | **Baseline, Sources & Pilot Scope** | ✅ **COMPLETED** | Working tree verified against ZIP SHA `39c46d38...`, MEGAPLAN adopted, ADR-001 rewritten for Muse, Heating Chamber selected, discrepancies documented. |
 | **G1** | **Runtime & Reproduction of Store** | ✅ **COMPLETED** | PostgreSQL 16.15 verified, Medusa DB migrated (148 tables), Corepack Yarn Berry enabled, both packages build, ReportLab PDF worker verified, live v1 routes smoked. |
-| G2 | Early Muse GLB Delivery Capability | ⏳ Pending | Next gate: Test GLB delivery path and dimensional handling (+Y up, +Z front, meters) with Muse using synthetic GLB. Human has credentials available. |
-| G3 | Schemas, Data Module & Migrations | ⏳ Pending | `industrial-config` module, PostgreSQL tables, Zod contracts, and immutable snapshots. |
+| **G2** | **Early Muse GLB Delivery Capability** | ⚠️ **PARTIAL / BLOCKED_EXTERNAL** | Standalone SYN GLB (43,276 bytes, SHA `4730b336...`) and compact proxy (2,296 bytes) created, Khronos validated (0 errors), delivery endpoints deployed with immutable cache, CORS `*`, and signed URL expiration. Awaiting human operator with Muse credentials per `g2-operator-muse-checklist.md`. Does not block G3. |
+| G3 | Schemas, Data Module & Migrations | ⏳ Pending | `industrial-config` module, PostgreSQL tables, Zod contracts, and immutable snapshots. Next actionable gate. |
 | G4 | Usable Catalog & Real Evidence | ⏳ Pending | Verified snapshots for Horner X5, NOVUS N1200, and TZone THT-02 from official datasheets. |
 | G5 | Strict Rule Evaluator Engine | ⏳ Pending | Deterministic tri-state evaluation (`meets`, `does_not_meet`, `not_documented`) and v1 adapter. |
 | G6 | Product 3D Assets & Dimensional QA | ⏳ Pending | glTF 2.0 / GLB normalization (meters, +Y up, +Z front) and validator checks. |
@@ -38,24 +38,27 @@
 
 ### Gate G1: Runtime & Reproduction of the Storefront & Backend
 - **Date Completed:** 2026-10-03
+- **Accomplishments:** PostgreSQL 16.15 provisioned and running natively; Medusa database migrated (148 tables); npm/yarn locks authoritative; Node v22.23.3 LTS retained; `medusa-config` resolution documented; fail-fast production guards active; 5 broken symlinks fixed; Python venv with ReportLab 5.0.1 verified; backend and storefront production builds passed; live v1 smoke tests 100% OK.
+- **Artifacts Produced:** `docs/gates/G1.md`, `docs/gates/g1-runtime-report.md`, `docs/industrial/versions.md`, `scripts/requirements.txt`.
+
+### Gate G2: Early Muse GLB Delivery Capability
+- **Date Completed (Server-side):** 2026-10-03
 - **Accomplishments:**
-  - PostgreSQL 16.15 verified and running natively on Amazon Linux 2023. Resolves README PG16 vs Docker Compose PG15 discrepancy.
-  - Medusa database migrated: 34 core modules + custom `b2bPim` and `brandModuleService` applied; 148 tables created.
-  - Package manager locks authoritative: npm for `b2b-backend` monorepo, Yarn Berry 4.12.0 via Corepack for `b2b-storefront`.
-  - Node LTS compatibility: Node `v22.23.3` retained; documented deviation vs MEGAPLAN "Node 24".
-  - Configuration resolution: documented Node module precedence loading `medusa-config.js`; synchronized `medusa-config.js` and `medusa-config.ts` 1:1.
-  - Fail-fast enforcement: production boot blocked when secrets are missing or default.
-  - Filesystem portability: 5 broken symlinks fixed, `/home/ubuntu/hackday26` compatibility symlink created.
-  - Python runtime: `.venv` configured with Python 3.9.25, `reportlab==5.0.1`, `pillow==11.3.0`, `charset-normalizer==3.5.2`; persistent worker and CLI quote PDF generation verified with `%PDF-1.4` headers.
-  - Production builds: `npm run build` in `b2b-backend` (backend 11.77s, admin 41.39s) and `yarn build` in `b2b-storefront` (`BUILD_ID: 6r5cjhg2k2_Z8LtPv-QXt`) succeed.
-  - Unit tests: Storefront 100% PASS (39/39); Backend 384/462 tests PASS (10 failing suites preserved without rewriting assertions due to legacy synthetic SKU expectations; scheduled for harmonization in G3/G4).
-  - Live smoke tests: search, evaluate, offer, quote creation, and quote PDF stream tested on `http://localhost:9000` with 100% success.
+  - Standalone synthetic 3D model `SYN-IND-CTRL-01.glb` generated in exact METERS (`0.10m × 0.08m × 0.05m`), right-handed system with `+Y up, +Z front`, 4 explicit attachment anchors, and PBR materials.
+  - Zero errors in Khronos glTF-Validator; pure binary glTF 2.0 without Draco/Meshopt/KTX2 extensions.
+  - Deployed Medusa 2 delivery endpoints: `/industrial-assets/{sha256}/{filename}`, `/api/industrial/v2/experimental/assets/...`, and `/api/muse/v1/experimental/assets/.../download`.
+  - Implemented immutable caching (`public, max-age=31536000`), ETag validation, Range requests, wildcard CORS without credentials, signed token expiration (HTTP 410 Gone), and tampering protection (HTTP 403 Forbidden).
+  - Drafted OpenAPI 3.1 specification, operator checklist, and machine-readable capability ledger.
 - **Artifacts Produced:**
-  - `docs/gates/G1.md`
-  - `docs/gates/g1-runtime-report.md`
-  - `docs/industrial/versions.md`
-  - `scripts/requirements.txt`
-  - `docs/industrial/IMPLEMENTATION_STATE.md` (this ledger)
+  - `docs/gates/G2.md`
+  - `docs/industrial/muse-capability-report.json`
+  - `docs/industrial/g2-operator-muse-checklist.md`
+  - `docs/industrial/openapi-g2-experimental-assets.yaml`
+  - `storage/industrial/assets/4730b336b910dd4edfb2104dbf272ee05000e708e37e9a68c8031b46170045b6/SYN-IND-CTRL-01.glb`
+  - `scripts/generate-syn-glb.py`
+  - `b2b-backend/apps/backend/src/api/industrial-assets/[sha256]/[filename]/route.ts`
+  - `b2b-backend/apps/backend/src/api/api/industrial/v2/experimental/assets/...`
+  - `b2b-backend/apps/backend/src/api/api/muse/v1/experimental/assets/...`
 
 ---
 
@@ -68,6 +71,7 @@
 | ~**BLK-03**~ | ~Yarn package manager not installed on EC2 host~ | **CLEARED in G1** | G1 | Enabled Yarn 4.12.0 via Corepack. |
 | ~**BLK-04**~ | ~Python `reportlab` library not installed~ | **CLEARED in G1** | G1 | Installed `reportlab==5.0.1` and `pillow==11.3.0` in `.venv`. |
 | ~**BLK-05**~ | ~ZooWork account credentials missing~ | **CLEARED in G0** | N/A | ZooWork path abandoned. Human has Muse available; Gate G2 will test GLB delivery. |
+| **BLK-06** | Meta Muse external account execution requires human operator credentials | External verification of GLB import in Meta Muse pending | G2 | Human operator follows `docs/industrial/g2-operator-muse-checklist.md`. Does not block Gate G3 development. |
 
 ---
 
@@ -75,10 +79,11 @@
 
 - **Operating System:** Linux (EC2 `x86_64`, Amazon Linux 2023.12, kernel 6.18)
 - **User / Working Directory:** `ec2-user` / `/home/ec2-user/projects/hack-ecomer`
+- **Public Domain / Elastic IP:** `data.controlnautas.com` → `54.84.170.82` (Port 9000 HTTP staging active; HTTPS pending certificate setup)
 - **Node.js Runtime:** `v22.23.3` (Active LTS line)
 - **Package Managers:** npm `10.9.9` (`b2b-backend`), Yarn `4.12.0` (`b2b-storefront`)
 - **Python Runtime:** `3.9.25` (`.venv/bin/python3`)
-- **Database Engine:** PostgreSQL `16.15` (Native Amazon Linux package on `localhost:5432`)
+- **Database Engine:** PostgreSQL `16.15` (Native on `localhost:5432`)
 - **Target Remote:** `https://github.com/armando-token/hack-ecomer.git` (branch: `main`)
 - **Active Currency:** `USD` ($)
 - **Active Locale & Copy Language:** `en-US` (English)

@@ -1,0 +1,157 @@
+{
+  "schema_version": "model_manifest/2.0",
+  "id": "ast_syn_ctrl_01_v1",
+  "sku_or_syn_id": "SYN-IND-CTRL-01",
+  "variant_id": "variant_SYN_CTRL_01",
+  "units": "meter",
+  "linear_unit": "m",
+  "coordinate_system": "right_handed_y_up_z_forward",
+  "fidelity": "synthetic_dimensional_proxy",
+  "format": "model/gltf-binary",
+  "gltf_version": "2.0",
+  "extensions_required": [],
+  "dimensions_mm": {
+    "width": 100.0,
+    "height": 80.0,
+    "depth": 50.0
+  },
+  "bbox": {
+    "min": [
+      -0.05,
+      0.0,
+      -0.025
+    ],
+    "max": [
+      0.05,
+      0.08,
+      0.025
+    ],
+    "size": [
+      0.1,
+      0.08,
+      0.05
+    ]
+  },
+  "body_bbox_m": {
+    "min": [
+      -0.05,
+      0.0,
+      -0.025
+    ],
+    "max": [
+      0.05,
+      0.08,
+      0.025
+    ]
+  },
+  "geometry_bbox_m": {
+    "min": [
+      -0.05,
+      0.0,
+      -0.025
+    ],
+    "max": [
+      0.05,
+      0.08,
+      0.025
+    ]
+  },
+  "anchors": [
+    {
+      "name": "anchor_mounting_din_center",
+      "type": "mounting_din",
+      "position": [
+        0.0,
+        0.04,
+        -0.025
+      ],
+      "orientation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "port_id": "din_rail_mount",
+      "description": "DIN EN 50022 TS 35 rail mounting center",
+      "accuracy": "synthetic_exact"
+    },
+    {
+      "name": "anchor_terminal_power",
+      "type": "terminal_power",
+      "position": [
+        -0.03,
+        0.08,
+        0.0
+      ],
+      "orientation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "port_id": "pwr_in",
+      "description": "24V DC power supply input terminal block",
+      "accuracy": "synthetic_exact"
+    },
+    {
+      "name": "anchor_terminal_sensor",
+      "type": "terminal_sensor",
+      "position": [
+        0.03,
+        0.0,
+        0.0
+      ],
+      "orientation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "port_id": "sensor_in",
+      "description": "PT100 RTD sensor input terminal block",
+      "accuracy": "synthetic_exact"
+    },
+    {
+      "name": "anchor_display_center",
+      "type": "display_center",
+      "position": [
+        0.0,
+        0.04,
+        0.025
+      ],
+      "orientation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "port_id": "hmi_display",
+      "description": "Front optical display & HMI center face",
+      "accuracy": "synthetic_exact"
+    }
+  ],
+  "qa": {
+    "validator_errors": 0,
+    "dimensional_error_mm": {
+      "x": 0.0,
+      "y": 0.0,
+      "z": 0.0
+    },
+    "max_anchor_error_mm": 0.0,
+    "triangle_count": 684,
+    "vertex_count": 1368
+  },
+  "delivery": {
+    "mime_type": "model/gltf-binary",
+    "byte_length": 43276,
+    "sha256": "4730b336b910dd4edfb2104dbf272ee05000e708e37e9a68c8031b46170045b6"
+  },
+  "sha256": "4730b336b910dd4edfb2104dbf272ee05000e708e37e9a68c8031b46170045b6",
+  "byte_length": 43276,
+  "provenance": {
+    "kind": "synthetic_fixture",
+    "generator": "scripts/generate-syn-glb.py",
+    "governing_doc": "docs/industrial/MEGAPLAN_MUSE_API_3D_V2.md (\u00a715, \u00a716, \u00a733 G2)"
+  },
+  "created_at": "2026-10-03T20:52:55Z"
+}

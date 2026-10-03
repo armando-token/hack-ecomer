@@ -126,11 +126,51 @@ import {
   isOriginAllowed,
 } from "../lib/cors-security"
 
+const isPublicAssetDeliveryPath = (urlPath: string): boolean => {
+  return (
+    urlPath.startsWith("/api/industrial/v2/experimental/assets") ||
+    urlPath.startsWith("/industrial-assets") ||
+    urlPath.startsWith("/api/muse/v1/experimental/assets")
+  )
+}
+
 const corsSecurityMiddleware = (
   req: MedusaRequest,
   res: MedusaResponse,
   next: MedusaNextFunction
 ) => {
+  const rawUrl = req.originalUrl || req.url || ""
+  const urlPath = safeDecodePath(rawUrl) || ""
+
+  // Public/experimental content-addressed assets must use Access-Control-Allow-Origin: *
+  // and MUST NEVER include Access-Control-Allow-Credentials: true (MEGAPLAN §16.2 / Gate G2).
+  if (isPublicAssetDeliveryPath(urlPath)) {
+    res.setHeader("Access-Control-Allow-Origin", "*")
+    res.setHeader(
+      "Access-Control-Allow-Methods",
+      "GET, HEAD, OPTIONS"
+    )
+    res.setHeader(
+      "Access-Control-Allow-Headers",
+      "Range, Content-Type, Authorization, X-Request-Id, x-request-id"
+    )
+    res.setHeader(
+      "Access-Control-Expose-Headers",
+      "Content-Length, Content-Type, Content-Range, ETag, Accept-Ranges, Content-Disposition, X-Request-Id"
+    )
+    res.removeHeader("Access-Control-Allow-Credentials")
+
+    const reqId = (req as any).requestId || req.headers["x-request-id"]
+    if (reqId && typeof reqId === "string") {
+      res.setHeader("X-Request-Id", reqId)
+    }
+
+    if (req.method === "OPTIONS") {
+      return res.status(204).end()
+    }
+    return next()
+  }
+
   const origin = req.headers.origin as string | undefined
 
   if (origin && isOriginAllowed(origin)) {

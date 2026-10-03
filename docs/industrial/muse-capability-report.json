@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "report_id": "rep_g2_muse_capabilities_20261003",
+  "gate": "G2",
+  "governing_document": "docs/industrial/MEGAPLAN_MUSE_API_3D_V2.md (§16, §33 G2)",
+  "generated_at": "2026-10-03T20:59:00Z",
+  "delivery_path": {
+    "primary_asset": {
+      "production_url": "https://data.controlnautas.com/industrial-assets/4730b336b910dd4edfb2104dbf272ee05000e708e37e9a68c8031b46170045b6/SYN-IND-CTRL-01.glb",
+      "staging_url": "http://127.0.0.1:9000/industrial-assets/4730b336b910dd4edfb2104dbf272ee05000e708e37e9a68c8031b46170045b6/SYN-IND-CTRL-01.glb",
+      "api_v2_url": "http://127.0.0.1:9000/api/industrial/v2/experimental/assets/4730b336b910dd4edfb2104dbf272ee05000e708e37e9a68c8031b46170045b6/SYN-IND-CTRL-01.glb",
+      "signed_download_url": "http://127.0.0.1:9000/api/muse/v1/experimental/assets/ast_syn_ctrl_01_v1/download",
+      "local_cas_path": "/home/ec2-user/projects/hack-ecomer/storage/industrial/assets/4730b336b910dd4edfb2104dbf272ee05000e708e37e9a68c8031b46170045b6/SYN-IND-CTRL-01.glb"
+    },
+    "compact_asset": {
+      "production_url": "https://data.controlnautas.com/industrial-assets/ae51669a603c28ef8d031bf7b0d11e847c35593e8e4f3b47e3b5a89f8dbbb438/SYN-IND-CTRL-01.glb",
+      "staging_url": "http://127.0.0.1:9000/industrial-assets/ae51669a603c28ef8d031bf7b0d11e847c35593e8e4f3b47e3b5a89f8dbbb438/SYN-IND-CTRL-01.glb",
+      "local_cas_path": "/home/ec2-user/projects/hack-ecomer/storage/industrial/assets/ae51669a603c28ef8d031bf7b0d11e847c35593e8e4f3b47e3b5a89f8dbbb438/SYN-IND-CTRL-01.glb"
+    }
+  },
+  "local_byte_proof": {
+    "primary": {
+      "sha256": "4730b336b910dd4edfb2104dbf272ee05000e708e37e9a68c8031b46170045b6",
+      "byte_length": 43276,
+      "magic": "glTF",
+      "valid_gltf2": true,
+      "khronos_validator_errors": 0,
+      "triangles": 684,
+      "anchors": [
+        "anchor_mounting_din_center",
+        "anchor_terminal_power",
+        "anchor_terminal_sensor",
+        "anchor_display_center"
+      ],
+      "bounds_m": {
+        "min": [-0.05, 0.0, -0.025],
+        "max": [0.05, 0.08, 0.025],
+        "dimensions": [0.1, 0.08, 0.05]
+      }
+    },
+    "compact": {
+      "sha256": "ae51669a603c28ef8d031bf7b0d11e847c35593e8e4f3b47e3b5a89f8dbbb438",
+      "byte_length": 2296,
+      "magic": "glTF",
+      "valid_gltf2": true,
+      "bounds_m": {
+        "min": [-0.05, 0.0, 0.0],
+        "max": [0.05, 0.08, 0.05],
+        "dimensions": [0.1, 0.08, 0.05]
+      }
+    }
+  },
+  "muse_import_status": "blocked_external",
+  "scale_observation": "pending_human_operator_verification",
+  "expected_scale": {
+    "dimensions_m": {
+      "width_x": 0.1,
+      "height_y": 0.08,
+      "depth_z": 0.05
+    },
+    "dimensions_mm": {
+      "width_x": 100,
+      "height_y": 80,
+      "depth_z": 50
+    },
+    "coordinate_frame": "+Y up, +Z forward",
+    "handedness": "right_handed"
+  },
+  "limitations": [
+    "No assumption of iframe embedding in Controlnautas website",
+    "Muse presentation rendered in Meta Muse runtime / client environment",
+    "Scene graph hash inspection is not_observable externally without Muse client debug API",
+    "Production host data.controlnautas.com HTTPS pending; HTTP staging path documented"
+  ],
+  "next_human_action": {
+    "operator_instructions_document": "docs/industrial/g2-operator-muse-checklist.md",
+    "exact_prompt": "Import the 3D model from https://data.controlnautas.com/industrial-assets/4730b336b910dd4edfb2104dbf272ee05000e708e37e9a68c8031b46170045b6/SYN-IND-CTRL-01.glb (or staging HTTP endpoint http://127.0.0.1:9000/industrial-assets/4730b336b910dd4edfb2104dbf272ee05000e708e37e9a68c8031b46170045b6/SYN-IND-CTRL-01.glb) without regenerating or replacing with procedural primitives. Confirm dimensions and orientation.",
+    "command_for_local_staging_verification": "curl -I -s http://127.0.0.1:9000/industrial-assets/4730b336b910dd4edfb2104dbf272ee05000e708e37e9a68c8031b46170045b6/SYN-IND-CTRL-01.glb"
+  }
+}

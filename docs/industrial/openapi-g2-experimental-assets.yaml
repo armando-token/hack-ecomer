@@ -1,0 +1,524 @@
+openapi: 3.1.0
+info:
+  title: Controlnautas × Meta Muse - Gate G2 Experimental 3D Asset Delivery
+  version: 0.2.0-g2.exp
+  description: |
+    Experimental OpenAPI 3.1 contract for Gate G2 early verification of glTF 2.0 (GLB)
+    asset delivery to Meta Muse. Governed by `docs/industrial/MEGAPLAN_MUSE_API_3D_V2.md`
+    (§16 Entrega de archivos a Muse y prueba de capacidades, §33 Gate G2).
+
+    This contract defines:
+    1. The 3D model manifest resolution endpoint (`/api/muse/v2/products/{variantId}/model3d`),
+       providing geometric bounds (meters, right-handed +Y up, +Z front), anchor attachment
+       points, and immutable delivery URLs.
+    2. The direct content-addressed binary asset delivery endpoint (`/industrial-assets/{sha256}/{filename}`),
+       serving GLB 2.0 payloads with immutable caching and open CORS for the Meta Muse runtime.
+  license:
+    name: Proprietary / Industrial Pilot Evaluation
+    url: https://data.controlnautas.com
+  contact:
+    name: Controlnautas Engineering Integration
+    url: https://data.controlnautas.com
+
+servers:
+  - url: https://data.controlnautas.com
+    description: Production HTTPS Gateway (Host DNS / HTTPS TLS pending provisioning)
+  - url: http://127.0.0.1:9000
+    description: Local Medusa Backend Staging / Development Server
+
+paths:
+  /api/muse/v2/products/{variantId}/model3d:
+    get:
+      tags:
+        - Gate G2 - Experimental 3D Delivery
+      summary: Resolve 3D model manifest and delivery coordinates
+      description: |
+        Returns the dimensional envelope, coordinate frame definition, anchor attachment points,
+        and content-addressed delivery descriptor for a specified product variant or synthetic fixture.
+        Scoped to read-only catalog access.
+      operationId: getExperimentalProductModel3D
+      security:
+        - MuseBearerAuth:
+            - "catalog:read"
+      parameters:
+        - name: variantId
+          in: path
+          required: true
+          description: Unique canonical product variant identifier or synthetic fixture ID (e.g. `variant_SYN_CTRL_01` or `SYN-IND-CTRL-01`).
+          schema:
+            type: string
+            example: "variant_SYN_CTRL_01"
+        - name: snapshot_id
+          in: query
+          required: false
+          description: Optional historical technical snapshot ID to lock dimensional revision (e.g. `ts_SYN_CTRL_r1`).
+          schema:
+            type: string
+            example: "ts_SYN_CTRL_r1"
+        - name: asset_revision
+          in: query
+          required: false
+          description: Optional asset revision identifier (defaults to active revision).
+          schema:
+            type: string
+            example: "r1"
+      responses:
+        "200":
+          description: 3D model manifest and delivery metadata resolved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Model3DManifestResponse"
+              example:
+                schema_version: "model_manifest/2.0"
+                asset_id: "asset_SYN_CTRL_01"
+                variant_id: "variant_SYN_CTRL_01"
+                snapshot_id: "ts_SYN_CTRL_r1"
+                asset_revision: "r1"
+                fidelity: "dimensional_proxy_verified"
+                format: "glb"
+                coordinate_system: "right_handed_y_up_z_forward"
+                linear_unit: "m"
+                instance_scale: [1.0, 1.0, 1.0]
+                origin:
+                  kind: "mounting_din_rear_center"
+                  description: "Synthetic industrial controller enclosure mounted on DIN rail rear center"
+                dimensions_mm:
+                  width: 100.0
+                  height: 80.0
+                  depth: 50.0
+                body_bbox_m:
+                  min: [-0.05, 0.00, 0.00]
+                  max: [0.05, 0.08, 0.05]
+                geometry_bbox_m:
+                  min: [-0.05, 0.00, 0.00]
+                  max: [0.05, 0.08, 0.05]
+                anchors:
+                  - anchor_id: "anchor_mounting_din_center"
+                    node_name: "anchor_mounting_din_center"
+                    kind: "mounting_din"
+                    position_m: [0.0, 0.04, 0.0]
+                    rotation_quaternion: [0.0, 0.0, 0.0, 1.0]
+                    accuracy: "synthetic_exact"
+                  - anchor_id: "anchor_terminal_power"
+                    node_name: "anchor_terminal_power"
+                    kind: "terminal_power"
+                    position_m: [-0.03, 0.08, 0.02]
+                    rotation_quaternion: [0.0, 0.0, 0.0, 1.0]
+                    accuracy: "synthetic_exact"
+                  - anchor_id: "anchor_terminal_sensor"
+                    node_name: "anchor_terminal_sensor"
+                    kind: "terminal_sensor"
+                    position_m: [0.03, 0.00, 0.02]
+                    rotation_quaternion: [0.0, 0.0, 0.0, 1.0]
+                    accuracy: "synthetic_exact"
+                  - anchor_id: "anchor_display_center"
+                    node_name: "anchor_display_center"
+                    kind: "display_center"
+                    position_m: [0.0, 0.04, 0.05]
+                    rotation_quaternion: [0.0, 0.0, 0.0, 1.0]
+                    accuracy: "synthetic_exact"
+                qa:
+                  validator_errors: 0
+                  dimensional_error_mm:
+                    x: 0.0
+                    y: 0.0
+                    z: 0.0
+                  max_anchor_error_mm: 0.0
+                  triangle_count: 12
+                  texture_max_dimension_px: 0
+                provenance:
+                  kind: "synthetic_fixture"
+                  source_ids: []
+                delivery:
+                  access_mode: "public"
+                  mime_type: "model/gltf-binary"
+                  sha256: "ae51669a603c28ef8d031bf7b0d11e847c35593e8e4f3b47e3b5a89f8dbbb438"
+                  byte_length: 2296
+                  url: "https://data.controlnautas.com/industrial-assets/ae51669a603c28ef8d031bf7b0d11e847c35593e8e4f3b47e3b5a89f8dbbb438/SYN-IND-CTRL-01.glb"
+                  staging_url: "http://127.0.0.1:9000/industrial-assets/ae51669a603c28ef8d031bf7b0d11e847c35593e8e4f3b47e3b5a89f8dbbb438/SYN-IND-CTRL-01.glb"
+                  expires_at: null
+        "401":
+          description: Unauthorized - missing or invalid Bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden - token lacks required catalog:read scope.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Product variant not found or no 3D model available.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /industrial-assets/{sha256}/{filename}:
+    get:
+      tags:
+        - Gate G2 - Experimental 3D Delivery
+      summary: Direct glTF 2.0 binary asset delivery
+      description: |
+        Delivers the raw binary glTF 2.0 (`.glb`) asset identified by its SHA-256 hash.
+        Includes immutable HTTP cache headers (`Cache-Control: public, max-age=31536000, immutable`),
+        wildcard CORS header (`Access-Control-Allow-Origin: *`), and byte-range support
+        (`Accept-Ranges: bytes`) for Meta Muse client streaming.
+      operationId: getExperimentalBinaryAsset
+      security: []
+      parameters:
+        - name: sha256
+          in: path
+          required: true
+          description: Hexadecimal 64-character SHA-256 checksum of the asset.
+          schema:
+            type: string
+            pattern: "^[a-f0-9]{64}$"
+            example: "ae51669a603c28ef8d031bf7b0d11e847c35593e8e4f3b47e3b5a89f8dbbb438"
+        - name: filename
+          in: path
+          required: true
+          description: Filename ending in `.glb`.
+          schema:
+            type: string
+            pattern: "^[a-zA-Z0-9_-]+\\.glb$"
+            example: "SYN-IND-CTRL-01.glb"
+      responses:
+        "200":
+          description: Full GLB binary stream.
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: "model/gltf-binary"
+            Content-Length:
+              schema:
+                type: integer
+                example: 2296
+            ETag:
+              schema:
+                type: string
+                example: '"ae51669a603c28ef8d031bf7b0d11e847c35593e8e4f3b47e3b5a89f8dbbb438"'
+            Cache-Control:
+              schema:
+                type: string
+                example: "public, max-age=31536000, immutable"
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+                example: "*"
+            Accept-Ranges:
+              schema:
+                type: string
+                example: "bytes"
+          content:
+            model/gltf-binary:
+              schema:
+                type: string
+                format: binary
+        "206":
+          description: Partial content response for HTTP Range requests.
+          headers:
+            Content-Range:
+              schema:
+                type: string
+                example: "bytes 0-1023/2296"
+            Content-Length:
+              schema:
+                type: integer
+                example: 1024
+          content:
+            model/gltf-binary:
+              schema:
+                type: string
+                format: binary
+        "304":
+          description: Not Modified - client cache is fresh according to ETag / If-None-Match.
+        "400":
+          description: Invalid SHA-256 format or invalid filename.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Asset not found for the specified SHA-256 and filename.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+    head:
+      tags:
+        - Gate G2 - Experimental 3D Delivery
+      summary: Asset headers and pre-flight check
+      description: Returns identical headers as GET without downloading the binary payload.
+      operationId: headExperimentalBinaryAsset
+      security: []
+      parameters:
+        - name: sha256
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: "^[a-f0-9]{64}$"
+        - name: filename
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: "^[a-zA-Z0-9_-]+\\.glb$"
+      responses:
+        "200":
+          description: Headers returned successfully.
+        "404":
+          description: Asset not found.
+
+components:
+  securitySchemes:
+    MuseBearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: |
+        Bearer token scoped for Meta Muse M2M connector operations.
+        Requires `catalog:read` scope for 3D model manifest discovery.
+
+  schemas:
+    Model3DManifestResponse:
+      type: object
+      required:
+        - schema_version
+        - asset_id
+        - variant_id
+        - snapshot_id
+        - asset_revision
+        - fidelity
+        - format
+        - coordinate_system
+        - linear_unit
+        - instance_scale
+        - origin
+        - dimensions_mm
+        - body_bbox_m
+        - geometry_bbox_m
+        - anchors
+        - qa
+        - provenance
+        - delivery
+      additionalProperties: false
+      properties:
+        schema_version:
+          type: string
+          enum: ["model_manifest/2.0"]
+        asset_id:
+          type: string
+          example: "asset_SYN_CTRL_01"
+        variant_id:
+          type: string
+          example: "variant_SYN_CTRL_01"
+        snapshot_id:
+          type: string
+          example: "ts_SYN_CTRL_r1"
+        asset_revision:
+          type: string
+          example: "r1"
+        fidelity:
+          type: string
+          enum: ["dimensional_proxy_verified", "manufacturer_cad_verified", "illustrative_mesh"]
+        format:
+          type: string
+          enum: ["glb"]
+        coordinate_system:
+          type: string
+          enum: ["right_handed_y_up_z_forward"]
+        linear_unit:
+          type: string
+          enum: ["m"]
+        instance_scale:
+          type: array
+          items:
+            type: number
+          minItems: 3
+          maxItems: 3
+          example: [1.0, 1.0, 1.0]
+        origin:
+          type: object
+          required:
+            - kind
+            - description
+          properties:
+            kind:
+              type: string
+              example: "mounting_din_rear_center"
+            description:
+              type: string
+              example: "DIN rail rear mounting center"
+        dimensions_mm:
+          type: object
+          required:
+            - width
+            - height
+            - depth
+          properties:
+            width:
+              type: number
+              example: 100.0
+            height:
+              type: number
+              example: 80.0
+            depth:
+              type: number
+              example: 50.0
+        body_bbox_m:
+          $ref: "#/components/schemas/BoundingBox3D"
+        geometry_bbox_m:
+          $ref: "#/components/schemas/BoundingBox3D"
+        anchors:
+          type: array
+          items:
+            $ref: "#/components/schemas/AnchorDefinition"
+        qa:
+          type: object
+          required:
+            - validator_errors
+            - dimensional_error_mm
+            - max_anchor_error_mm
+            - triangle_count
+            - texture_max_dimension_px
+          properties:
+            validator_errors:
+              type: integer
+              example: 0
+            dimensional_error_mm:
+              type: object
+              properties:
+                x: { type: number, example: 0.0 }
+                y: { type: number, example: 0.0 }
+                z: { type: number, example: 0.0 }
+            max_anchor_error_mm:
+              type: number
+              example: 0.0
+            triangle_count:
+              type: integer
+              example: 12
+            texture_max_dimension_px:
+              type: integer
+              example: 0
+        provenance:
+          type: object
+          required:
+            - kind
+            - source_ids
+          properties:
+            kind:
+              type: string
+              enum: ["synthetic_fixture", "manufacturer_datasheet", "cad_import"]
+            source_ids:
+              type: array
+              items:
+                type: string
+        delivery:
+          $ref: "#/components/schemas/DeliveryInfo"
+
+    BoundingBox3D:
+      type: object
+      required:
+        - min
+        - max
+      properties:
+        min:
+          $ref: "#/components/schemas/Vector3"
+        max:
+          $ref: "#/components/schemas/Vector3"
+
+    Vector3:
+      type: array
+      items:
+        type: number
+      minItems: 3
+      maxItems: 3
+      example: [0.0, 0.0, 0.0]
+
+    AnchorDefinition:
+      type: object
+      required:
+        - anchor_id
+        - node_name
+        - kind
+        - position_m
+        - rotation_quaternion
+        - accuracy
+      properties:
+        anchor_id:
+          type: string
+          example: "anchor_mounting_din_center"
+        node_name:
+          type: string
+          example: "anchor_mounting_din_center"
+        kind:
+          type: string
+          example: "mounting_din"
+        position_m:
+          $ref: "#/components/schemas/Vector3"
+        rotation_quaternion:
+          type: array
+          items:
+            type: number
+          minItems: 4
+          maxItems: 4
+          example: [0.0, 0.0, 0.0, 1.0]
+        accuracy:
+          type: string
+          enum: ["synthetic_exact", "datasheet_derived", "approximate"]
+
+    DeliveryInfo:
+      type: object
+      required:
+        - access_mode
+        - mime_type
+        - sha256
+        - byte_length
+        - url
+      properties:
+        access_mode:
+          type: string
+          enum: ["public", "signed_url", "connector_download"]
+        mime_type:
+          type: string
+          enum: ["model/gltf-binary"]
+        sha256:
+          type: string
+          pattern: "^[a-f0-9]{64}$"
+          example: "ae51669a603c28ef8d031bf7b0d11e847c35593e8e4f3b47e3b5a89f8dbbb438"
+        byte_length:
+          type: integer
+          example: 2296
+        url:
+          type: string
+          format: uri
+          example: "https://data.controlnautas.com/industrial-assets/ae51669a603c28ef8d031bf7b0d11e847c35593e8e4f3b47e3b5a89f8dbbb438/SYN-IND-CTRL-01.glb"
+        staging_url:
+          type: string
+          format: uri
+          example: "http://127.0.0.1:9000/industrial-assets/ae51669a603c28ef8d031bf7b0d11e847c35593e8e4f3b47e3b5a89f8dbbb438/SYN-IND-CTRL-01.glb"
+        expires_at:
+          type: string
+          format: date-time
+          nullable: true
+          example: null
+
+    ErrorResponse:
+      type: object
+      required:
+        - error
+        - message
+      properties:
+        error:
+          type: string
+          example: "NOT_FOUND"
+        message:
+          type: string
+          example: "Specified variant or asset does not exist"
