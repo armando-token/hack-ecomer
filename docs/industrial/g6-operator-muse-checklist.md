@@ -39,10 +39,8 @@ Before initiating verification in Meta Muse, ensure the assets are accessible ei
 - **Fidelity Tier:** `dimensional_proxy_verified`
 - **File Size:** `27,340 bytes` (26.70 KB)
 - **SHA-256:** `47fac408170c283fb336fa07a45714dcf5eeed1a0cbaa1ffc464dffdcef559a5`
-- **Public CAS Delivery URL:**  
+- **Public CAS Delivery URL (HTTPS):**  
   `https://data.controlnautas.com/industrial-assets/47fac408170c283fb336fa07a45714dcf5eeed1a0cbaa1ffc464dffdcef559a5/CN-X5PRIME-HE-XP5.glb`
-- **Staging / Local Tunnel URL (Port 9000):**  
-  `http://127.0.0.1:9000/industrial-assets/47fac408170c283fb336fa07a45714dcf5eeed1a0cbaa1ffc464dffdcef559a5/CN-X5PRIME-HE-XP5.glb`
 - **Signed Short-Lived URL (15-Minute TTL):**  
   Obtained via API: `GET /api/industrial/v2/experimental/assets/ast_cn_x5prime_he_xp5_glb_v1/delivery` (returns `download_url` with query parameter `?token=...&expires=...`).
 
@@ -50,10 +48,8 @@ Before initiating verification in Meta Muse, ensure the assets are accessible ei
 - **Fidelity Tier:** `dimensional_proxy_verified`
 - **File Size:** `31,408 bytes` (30.67 KB)
 - **SHA-256:** `73e2bfc0f7d02c8f0e69c95f95a019492215b46b70daeb7fd474c478b545fcf2`
-- **Public CAS Delivery URL:**  
+- **Public CAS Delivery URL (HTTPS):**  
   `https://data.controlnautas.com/industrial-assets/73e2bfc0f7d02c8f0e69c95f95a019492215b46b70daeb7fd474c478b545fcf2/CN-N1200.glb`
-- **Staging / Local Tunnel URL (Port 9000):**  
-  `http://127.0.0.1:9000/industrial-assets/73e2bfc0f7d02c8f0e69c95f95a019492215b46b70daeb7fd474c478b545fcf2/CN-N1200.glb`
 - **Signed Short-Lived URL (15-Minute TTL):**  
   Obtained via API: `GET /api/industrial/v2/experimental/assets/ast_cn_n1200_glb_v1/delivery`.
 
@@ -61,10 +57,8 @@ Before initiating verification in Meta Muse, ensure the assets are accessible ei
 - **Fidelity Tier:** `dimensional_proxy_verified`
 - **File Size:** `15,420 bytes` (15.06 KB)
 - **SHA-256:** `7e5d88e48e051933807cb70fc184aa5c167c59ded25a5cf27f17b5046293d327`
-- **Public CAS Delivery URL:**  
+- **Public CAS Delivery URL (HTTPS):**  
   `https://data.controlnautas.com/industrial-assets/7e5d88e48e051933807cb70fc184aa5c167c59ded25a5cf27f17b5046293d327/CN-THT02.glb`
-- **Staging / Local Tunnel URL (Port 9000):**  
-  `http://127.0.0.1:9000/industrial-assets/7e5d88e48e051933807cb70fc184aa5c167c59ded25a5cf27f17b5046293d327/CN-THT02.glb`
 - **Signed Short-Lived URL (15-Minute TTL):**  
   Obtained via API: `GET /api/industrial/v2/experimental/assets/ast_cn_tht02_glb_v1/delivery`.
 
@@ -77,7 +71,7 @@ Before initiating verification in Meta Muse, ensure the assets are accessible ei
 #### Step 1.1: Request Direct Import
 In a clean Meta Muse conversation, enter:
 ```text
-Import the industrial 3D model from https://data.controlnautas.com/industrial-assets/47fac408170c283fb336fa07a45714dcf5eeed1a0cbaa1ffc464dffdcef559a5/CN-X5PRIME-HE-XP5.glb (or staging endpoint http://127.0.0.1:9000/industrial-assets/47fac408170c283fb336fa07a45714dcf5eeed1a0cbaa1ffc464dffdcef559a5/CN-X5PRIME-HE-XP5.glb).
+Import the industrial 3D model from https://data.controlnautas.com/industrial-assets/47fac408170c283fb336fa07a45714dcf5eeed1a0cbaa1ffc464dffdcef559a5/CN-X5PRIME-HE-XP5.glb.
 Do not substitute with procedural primitives. Ingest the actual glTF 2.0 binary asset and report its bounding box dimensions, coordinate system, and scene nodes.
 ```
 
@@ -113,7 +107,7 @@ Confirm the presence and translation of all 9 nodes:
 
 #### Step 2.1: Request Direct Import
 ```text
-Import the industrial 3D model from https://data.controlnautas.com/industrial-assets/73e2bfc0f7d02c8f0e69c95f95a019492215b46b70daeb7fd474c478b545fcf2/CN-N1200.glb (or staging endpoint http://127.0.0.1:9000/industrial-assets/73e2bfc0f7d02c8f0e69c95f95a019492215b46b70daeb7fd474c478b545fcf2/CN-N1200.glb).
+Import the industrial 3D model from https://data.controlnautas.com/industrial-assets/73e2bfc0f7d02c8f0e69c95f95a019492215b46b70daeb7fd474c478b545fcf2/CN-N1200.glb.
 Ingest the binary glTF asset without procedural substitution and report bounding extents and scene hierarchy.
 ```
 
@@ -140,7 +134,7 @@ Confirm all 9 nodes:
 
 #### Step 3.1: Request Direct Import
 ```text
-Import the industrial 3D model from https://data.controlnautas.com/industrial-assets/7e5d88e48e051933807cb70fc184aa5c167c59ded25a5cf27f17b5046293d327/CN-THT02.glb (or staging endpoint http://127.0.0.1:9000/industrial-assets/7e5d88e48e051933807cb70fc184aa5c167c59ded25a5cf27f17b5046293d327/CN-THT02.glb).
+Import the industrial 3D model from https://data.controlnautas.com/industrial-assets/7e5d88e48e051933807cb70fc184aa5c167c59ded25a5cf27f17b5046293d327/CN-THT02.glb.
 Confirm coordinate orientation and scene hierarchy.
 ```
 

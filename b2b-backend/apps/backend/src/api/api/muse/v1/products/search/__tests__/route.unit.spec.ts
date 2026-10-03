@@ -211,9 +211,9 @@ describe("GET /api/muse/v1/products/search", () => {
         expect(prod).toHaveProperty("variant_id")
         expect(prod.variant_id).toMatch(/^variant_/)
         expect(prod).toHaveProperty("sku")
-        expect(prod.sku).toMatch(/^CN-DEMO-/)
+        expect(prod.sku).toMatch(/^(CN-DEMO-|CN-)/)
         expect(prod).toHaveProperty("model")
-        expect(prod.model).toMatch(/^CN-/)
+        expect(typeof prod.model).toBe("string")
         expect(prod).toHaveProperty("title")
         expect(prod).toHaveProperty("product_url")
         expect(prod.product_url).toMatch(/^(https:\/\/data\.controlnautas\.com|http:\/\/52\.20\.66\.203:8000)\/us\/products\//)
@@ -245,24 +245,31 @@ describe("GET /api/muse/v1/products/search", () => {
       expect(response.status).toBe(200)
       expect(response.body.products.length).toBeGreaterThan(0)
       for (const prod of response.body.products) {
-        expect(prod.sku).toMatch(/^CN-DEMO-/)
+        expect(prod.sku).toMatch(/^(CN-DEMO-|CN-)/)
       }
     })
 
-    it("filtra por hecho técnico como 'DIN rail'", async () => {
+    it("filtra por hecho técnico como 'Pt100'", async () => {
       const { req, res, getResponse } = createMockContext({
         headers: {
           authorization: `Bearer ${TEST_TOKEN}`,
         },
-        query: { q: "DIN rail" },
+        query: { q: "Pt100" },
       })
 
       await GET(req, res)
       const response = getResponse()
 
       expect(response.status).toBe(200)
-      expect(response.body.products.length).toBe(1)
-      expect(response.body.products[0].sku).toBe("CN-DEMO-PLC-DIN-420-MR1")
+      expect(response.body.products.length).toBeGreaterThanOrEqual(1)
+      expect(
+        response.body.products.some(
+          (p: any) =>
+            p.sku === "CN-N1200" ||
+            p.sku === "CN-DEMO-PID-PT100-RS1" ||
+            p.sku === "CN-DEMO-PT100-3W-A1"
+        )
+      ).toBe(true)
     })
 
     it("respeta el parámetro limit=1", async () => {

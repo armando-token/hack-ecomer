@@ -1,0 +1,941 @@
+openapi: 3.1.0
+info:
+  title: Controlnautas Industrial API v2 - Meta Muse Architecture Demo
+  version: 2.0.0
+  description: |
+    Stable read API surface for Meta Muse industrial agent connector on Controlnautas B2B Industrial.
+    Governed by `docs/industrial/MEGAPLAN_MUSE_API_3D_V2.md` (§14, §21, §33 G7).
+    Reuses G4 catalog snapshots, G5 strict deterministic evaluator, and G6 3D assets.
+  license:
+    name: Proprietary / Industrial Pilot Evaluation
+    url: https://data.controlnautas.com
+  contact:
+    name: Controlnautas Engineering Integration
+    url: https://data.controlnautas.com
+
+servers:
+  - url: https://data.controlnautas.com
+    description: Production HTTPS Edge
+  - url: http://localhost:9000
+    description: Local Backend Dev
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      description: Optional bearer token for Meta Muse agent authorization (MUSE_API_TOKEN). Read operations permit public access or valid token.
+
+  schemas:
+    CapabilitiesResponse:
+      type: object
+      required:
+        - api_version
+        - rules_version
+        - process_families
+        - pilot_skus
+        - search
+        - models_3d
+        - evaluation
+        - auth
+      properties:
+        api_version:
+          type: string
+          example: "2.0.0"
+        rules_version:
+          type: string
+          example: "2026.g5.1"
+        process_families:
+          type: array
+          items:
+            type: string
+          example: ["Heating Chamber"]
+        pilot_skus:
+          type: array
+          items:
+            type: string
+          example: ["CN-X5PRIME-HE-XP5", "CN-N1200", "CN-THT02"]
+        search:
+          type: object
+          required:
+            - supported_filters
+            - max_limit
+            - default_limit
+          properties:
+            supported_filters:
+              type: array
+              items:
+                type: string
+              example: ["q", "sku", "manufacturer", "role", "signal_type", "protocol", "mounting_type", "has_model3d", "limit", "cursor"]
+            max_limit:
+              type: integer
+              example: 50
+            default_limit:
+              type: integer
+              example: 10
+        models_3d:
+          type: object
+          required:
+            - supported_format
+            - coordinate_system
+            - units
+            - default_fidelity
+            - base_url
+          properties:
+            supported_format:
+              type: string
+              example: "model/gltf-binary"
+            coordinate_system:
+              type: string
+              example: "right_handed_y_up_z_forward"
+            units:
+              type: string
+              example: "meters"
+            default_fidelity:
+              type: string
+              example: "dimensional_proxy_verified"
+            base_url:
+              type: string
+              example: "https://data.controlnautas.com/industrial-assets"
+        evaluation:
+          type: object
+          required:
+            - engine
+            - verdicts
+            - supports_evidence_refs
+          properties:
+            engine:
+              type: string
+              example: "strict_evaluator_pure"
+            verdicts:
+              type: array
+              items:
+                type: string
+              example: ["meets", "does_not_meet", "not_documented"]
+            supports_evidence_refs:
+              type: boolean
+              example: true
+        auth:
+          type: object
+          required:
+            - scheme
+            - header
+            - read_operations
+          properties:
+            scheme:
+              type: string
+              example: "Bearer"
+            header:
+              type: string
+              example: "Authorization: Bearer <MUSE_API_TOKEN>"
+            read_operations:
+              type: array
+              items:
+                type: string
+              example: ["capabilities", "products/search", "products/{idOrSku}", "products/{idOrSku}/model3d", "evaluate", "configurations/heating-chamber/bundle"]
+
+    ProductSearchItem:
+      type: object
+      required:
+        - sku
+        - title
+        - manufacturer
+        - role
+        - snapshot_id
+        - technical_summary
+        - envelope_m
+        - ports_count
+        - has_model3d
+        - model3d_url
+        - fidelity
+        - product_url
+      properties:
+        sku:
+          type: string
+          example: "CN-X5PRIME-HE-XP5"
+        title:
+          type: string
+          example: "X5 Prime OCS All-in-One Controller (HE-XP5)"
+        manufacturer:
+          type: string
+          example: "Horner Automation"
+        role:
+          type: string
+          example: "controller"
+        snapshot_id:
+          type: string
+          example: "snp_cn_x5prime_he_xp5_v1"
+        technical_summary:
+          type: string
+          example: "Horner Automation OCS, built-in I/O, 10–30 VDC primary power"
+        envelope_m:
+          type: array
+          items:
+            type: number
+          minItems: 3
+          maxItems: 3
+          example: [0.120, 0.091, 0.060]
+        ports_count:
+          type: integer
+          example: 5
+        has_model3d:
+          type: boolean
+          example: true
+        model3d_url:
+          type: string
+          nullable: true
+          example: "https://data.controlnautas.com/industrial-assets/47fac408170c283fb336fa07a45714dcf5eeed1a0cbaa1ffc464dffdcef559a5/CN-X5PRIME-HE-XP5.glb"
+        fidelity:
+          type: string
+          example: "dimensional_proxy_verified"
+        product_url:
+          type: string
+          example: "https://data.controlnautas.com/us/products/cn-x5prime-he-xp5"
+
+    ProductSearchResponse:
+      type: object
+      required:
+        - products
+        - count
+        - total
+      properties:
+        products:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductSearchItem'
+        count:
+          type: integer
+          example: 3
+        total:
+          type: integer
+          example: 3
+        cursor:
+          type: string
+          nullable: true
+          example: null
+
+    ProductSnapshotDetail:
+      type: object
+      required:
+        - sku
+        - variant_id
+        - snapshot_id
+        - manufacturer
+        - title
+        - role
+        - envelope_m
+        - ports
+        - facts
+      properties:
+        identity:
+          type: object
+          properties:
+            sku:
+              type: string
+            variant_id:
+              type: string
+            snapshot_id:
+              type: string
+            title:
+              type: string
+            manufacturer:
+              type: string
+            model:
+              type: string
+            role:
+              type: string
+        sku:
+          type: string
+          example: "CN-X5PRIME-HE-XP5"
+        variant_id:
+          type: string
+          example: "variant_01M41R18MQK0GXGPTYSX0EDZBH"
+        snapshot_id:
+          type: string
+          example: "snp_cn_x5prime_he_xp5_v1"
+        manufacturer:
+          type: string
+          example: "Horner Automation"
+        manufacturer_part_number:
+          type: string
+          example: "HE-XP5"
+        title:
+          type: string
+          example: "X5 Prime OCS All-in-One Controller (HE-XP5)"
+        role:
+          type: string
+          example: "controller"
+        technical_summary:
+          type: string
+          example: "Horner Automation OCS, built-in I/O, 10–30 VDC primary power"
+        technical_revision:
+          type: string
+          example: "rev_2026_g4"
+        state:
+          type: string
+          example: "published"
+        metric_envelope:
+          type: array
+          items:
+            type: number
+          example: [0.120, 0.091, 0.060]
+        envelope_m:
+          type: array
+          items:
+            type: number
+          example: [0.120, 0.091, 0.060]
+        dimensions:
+          type: object
+          properties:
+            width_mm:
+              type: number
+            height_mm:
+              type: number
+            depth_mm:
+              type: number
+            envelope_m:
+              type: array
+              items:
+                type: number
+        mounting:
+          type: array
+          items:
+            type: string
+          example: ["panel_mount", "din_rail_clip"]
+        capabilities:
+          type: array
+          items:
+            type: string
+        ports:
+          type: array
+          items:
+            type: object
+            required:
+              - port_id
+              - label
+              - category
+              - direction
+              - signal_type
+              - terminals
+            properties:
+              port_id:
+                type: string
+              label:
+                type: string
+              category:
+                type: string
+              direction:
+                type: string
+                enum: [input, output, bidirectional]
+              signal_type:
+                type: string
+              terminals:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    label:
+                      type: string
+                    function:
+                      type: string
+        facts:
+          type: array
+          items:
+            type: object
+            properties:
+              attribute_id:
+                type: string
+              property:
+                type: string
+              value:
+                type: object
+              data_status:
+                type: string
+              evidence_refs:
+                type: array
+                items:
+                  type: object
+        model3d:
+          type: object
+          nullable: true
+          properties:
+            has_model3d:
+              type: boolean
+            asset_id:
+              type: string
+            sku:
+              type: string
+            fidelity:
+              type: string
+            format:
+              type: string
+            units:
+              type: string
+            url:
+              type: string
+            sha256:
+              type: string
+            bytes:
+              type: integer
+            manifest_url:
+              type: string
+        product_url:
+          type: string
+          example: "https://data.controlnautas.com/us/products/cn-x5prime-he-xp5"
+
+    Model3DMetadata:
+      type: object
+      required:
+        - asset_id
+        - sku
+        - fidelity
+        - format
+        - units
+        - url
+        - sha256
+        - bytes
+        - anchors
+        - manifest_url
+      properties:
+        asset_id:
+          type: string
+          example: "ast_cn_x5prime_he_xp5_glb_v1"
+        sku:
+          type: string
+          example: "CN-X5PRIME-HE-XP5"
+        fidelity:
+          type: string
+          example: "dimensional_proxy_verified"
+        format:
+          type: string
+          example: "model/gltf-binary"
+        units:
+          type: string
+          example: "meters"
+        url:
+          type: string
+          example: "https://data.controlnautas.com/industrial-assets/47fac408170c283fb336fa07a45714dcf5eeed1a0cbaa1ffc464dffdcef559a5/CN-X5PRIME-HE-XP5.glb"
+        sha256:
+          type: string
+          example: "47fac408170c283fb336fa07a45714dcf5eeed1a0cbaa1ffc464dffdcef559a5"
+        bytes:
+          type: integer
+          example: 27340
+        anchors:
+          type: array
+          items:
+            type: object
+            required:
+              - name
+              - position
+              - orientation
+            properties:
+              name:
+                type: string
+              type:
+                type: string
+              position:
+                type: array
+                items:
+                  type: number
+              orientation:
+                type: array
+                items:
+                  type: number
+              port_id:
+                type: string
+              description:
+                type: string
+              accuracy:
+                type: string
+        manifest_url:
+          type: string
+          example: "/industrial-assets/47fac408170c283fb336fa07a45714dcf5eeed1a0cbaa1ffc464dffdcef559a5/CN-X5PRIME-HE-XP5.manifest.json"
+
+    TechnicalRequirement:
+      type: object
+      required:
+        - requirement_id
+        - property
+      properties:
+        requirement_id:
+          type: string
+          example: "req_supply_voltage"
+        property:
+          type: string
+          example: "supply_voltage"
+        operator:
+          type: string
+          example: "in_range"
+        value:
+          type: object
+        target:
+          type: string
+          example: "product"
+        required:
+          type: boolean
+          default: true
+
+    EvaluateRequest:
+      type: object
+      required:
+        - sku
+        - requirements
+      properties:
+        sku:
+          type: string
+          example: "CN-X5PRIME-HE-XP5"
+        requirements:
+          type: array
+          items:
+            $ref: '#/components/schemas/TechnicalRequirement'
+        context:
+          type: object
+          example: { process_family: "Heating Chamber" }
+
+    RuleResult:
+      type: object
+      required:
+        - rule_id
+        - verdict
+        - scope
+      properties:
+        rule_id:
+          type: string
+          example: "RULE_SUPPLY_VOLTAGE"
+        verdict:
+          type: string
+          enum: [meets, does_not_meet, not_documented]
+        scope:
+          type: string
+          example: "product"
+        reason_code:
+          type: string
+          example: "SATISFIED"
+        message:
+          type: string
+          example: "Voltage requirement satisfied by documented rating"
+        required:
+          type: boolean
+          example: true
+        evidence_refs:
+          type: array
+          items:
+            type: object
+
+    EvaluationResponse:
+      type: object
+      required:
+        - sku
+        - overall_verdict
+        - rule_set_version
+        - evaluations
+        - unverified_scopes
+        - evaluated_at
+      properties:
+        sku:
+          type: string
+          example: "CN-X5PRIME-HE-XP5"
+        overall_verdict:
+          type: string
+          enum: [meets, does_not_meet, not_documented]
+          example: "meets"
+        overall_status:
+          type: string
+          example: "meets"
+        rule_set_version:
+          type: string
+          example: "2026.g5.1"
+        evaluations:
+          type: array
+          items:
+            $ref: '#/components/schemas/RuleResult'
+        unverified_scopes:
+          type: array
+          items:
+            type: string
+          example: []
+        validation_scope:
+          type: array
+          items:
+            type: string
+        evaluated_at:
+          type: string
+          format: date-time
+          example: "2026-10-03T22:00:00Z"
+
+    ConfigurationBundle:
+      type: object
+      required:
+        - schema_version
+        - identity
+        - engineering
+        - technical_evaluation
+        - assets
+        - process_context
+        - delivery
+      properties:
+        schema_version:
+          type: string
+          example: "industrial_bundle/2.0"
+        identity:
+          type: object
+          properties:
+            configuration_id:
+              type: string
+            revision:
+              type: integer
+            title:
+              type: string
+            process_family:
+              type: string
+            content_sha256:
+              type: string
+            created_at:
+              type: string
+        engineering:
+          type: object
+          properties:
+            instances:
+              type: array
+              items:
+                type: object
+            connections:
+              type: array
+              items:
+                type: object
+            networks:
+              type: array
+              items:
+                type: object
+            control_loops:
+              type: array
+              items:
+                type: object
+        technical_evaluation:
+          type: object
+          properties:
+            overall_status:
+              type: string
+            overall_verdict:
+              type: string
+            rule_set_version:
+              type: string
+            readiness:
+              type: object
+              properties:
+                technical_readiness:
+                  type: boolean
+                presentation_readiness:
+                  type: boolean
+                commercial_readiness:
+                  type: boolean
+        assets:
+          type: object
+        process_context:
+          type: object
+        delivery:
+          type: object
+
+    ErrorResponse:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: object
+          required:
+            - code
+            - message
+          properties:
+            code:
+              type: string
+              example: "NOT_FOUND"
+            message:
+              type: string
+              example: "Resource was not found."
+        request_id:
+          type: string
+          example: "req_f47ac10b-58cc-4372-a567-0e02b2c3d479"
+
+security:
+  - BearerAuth: []
+  - {}
+
+paths:
+  /api/industrial/v2/capabilities:
+    get:
+      tags:
+        - Capabilities
+      summary: Get Industrial API v2 capabilities and system vocabulary
+      description: |
+        Returns system API version, active rule set version, pilot process families,
+        supported search filters, 3D coordinate frame conventions, evaluator verdicts,
+        and authentication scheme.
+      operationId: getIndustrialCapabilities
+      security:
+        - BearerAuth: []
+        - {}
+      responses:
+        '200':
+          description: Capabilities and system metadata
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CapabilitiesResponse'
+        '401':
+          description: Unauthorized - Invalid Bearer token format or token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/industrial/v2/products/search:
+    get:
+      tags:
+        - Products
+      summary: Structured technical search across verified industrial snapshots
+      description: |
+        Searches published technical snapshots using exact or fuzzy criteria:
+        query text, SKU, manufacturer, component role, signal types, protocols, mounting styles,
+        and 3D asset availability.
+      operationId: searchIndustrialProducts
+      security:
+        - BearerAuth: []
+        - {}
+      parameters:
+        - name: q
+          in: query
+          required: false
+          description: Free-text search matching SKU, title, manufacturer, MPN, role, and port labels.
+          schema:
+            type: string
+            maxLength: 200
+        - name: sku
+          in: query
+          required: false
+          description: Exact or partial SKU filter.
+          schema:
+            type: string
+        - name: manufacturer
+          in: query
+          required: false
+          description: Manufacturer name filter.
+          schema:
+            type: string
+        - name: role
+          in: query
+          required: false
+          description: Component or communications role (e.g. controller, sensor, master, slave).
+          schema:
+            type: string
+        - name: signal_type
+          in: query
+          required: false
+          description: Required physical/logical port signal type (e.g. rs485, analog_0_10v_4_20ma, power_dc).
+          schema:
+            type: string
+        - name: protocol
+          in: query
+          required: false
+          description: Supported communication protocol (e.g. modbus_rtu, modbus_tcp).
+          schema:
+            type: string
+        - name: mounting_type
+          in: query
+          required: false
+          description: Mechanical mounting standard (e.g. din_rail, panel_mount).
+          schema:
+            type: string
+        - name: has_model3d
+          in: query
+          required: false
+          description: Filter by presence of verified 3D GLB model.
+          schema:
+            type: boolean
+        - name: limit
+          in: query
+          required: false
+          description: Maximum number of records to return (1-50, default 10).
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 10
+        - name: cursor
+          in: query
+          required: false
+          description: Opaque pagination cursor.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Matched product candidates
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductSearchResponse'
+        '400':
+          description: Invalid query parameters (e.g. limit out of bounds or q too long)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized - Invalid Bearer token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/industrial/v2/products/{idOrSku}:
+    get:
+      tags:
+        - Products
+      summary: Retrieve complete verified product snapshot and technical profile
+      description: |
+        Resolves product by SKU, snapshot ID, or Medusa variant ID. Returns identity,
+        metric envelope, terminal/port assignments, documented engineering facts with
+        evidence citations, and associated 3D asset metadata.
+      operationId: getProductSnapshotDetail
+      security:
+        - BearerAuth: []
+        - {}
+      parameters:
+        - name: idOrSku
+          in: path
+          required: true
+          description: Canonical SKU, snapshot ID, or variant ID (e.g. `CN-X5PRIME-HE-XP5` or `snp_cn_x5prime_he_xp5_v1`).
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Full technical snapshot details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductSnapshotDetail'
+        '404':
+          description: Product or snapshot not found in active catalog
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized - Invalid Bearer token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/industrial/v2/products/{idOrSku}/model3d:
+    get:
+      tags:
+        - Products
+        - 3D Assets
+      summary: Retrieve 3D GLB model descriptor, anchors, and delivery URLs
+      description: |
+        Returns the dimensional proxy asset descriptor for a given SKU, including format,
+        units (meters), SHA-256 integrity hash, anchor attachment ports, and CDN delivery URL.
+      operationId: getProductModel3D
+      security:
+        - BearerAuth: []
+        - {}
+      parameters:
+        - name: idOrSku
+          in: path
+          required: true
+          description: Canonical SKU, snapshot ID, or variant ID.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 3D model metadata and delivery descriptors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Model3DMetadata'
+        '404':
+          description: Product or 3D asset not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized - Invalid Bearer token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/industrial/v2/evaluate:
+    post:
+      tags:
+        - Evaluation
+      summary: Pure strict deterministic evaluation of product requirements
+      description: |
+        Executes strict evaluator engine against the pinned technical snapshot of the SKU.
+        Evaluates requirements without mutating database state. Returns tri-state verdicts:
+        `meets`, `does_not_meet`, or `not_documented`.
+      operationId: evaluateIndustrialProduct
+      security:
+        - BearerAuth: []
+        - {}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EvaluateRequest'
+      responses:
+        '200':
+          description: Deterministic evaluation result with rule-by-rule breakdown
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvaluationResponse'
+        '400':
+          description: Missing or malformed request body (e.g. missing sku)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Product with specified SKU not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized - Invalid Bearer token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/industrial/v2/configurations/heating-chamber/bundle:
+    get:
+      tags:
+        - Configurations
+      summary: Retrieve complete demo engineering bundle for Heating Chamber pilot
+      description: |
+        Returns the unified solution bundle for the Heating Chamber pilot system,
+        combining equipment instances, 3D asset bindings, wiring connections, RS-485 network,
+        PID control loop definition, and verified evaluation status.
+      operationId: getHeatingChamberBundle
+      security:
+        - BearerAuth: []
+        - {}
+      responses:
+        '200':
+          description: Complete heating chamber solution bundle
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConfigurationBundle'
+        '401':
+          description: Unauthorized - Invalid Bearer token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'

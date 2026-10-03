@@ -1,8 +1,8 @@
 # Project Implementation State Ledger
 
-**Current Gate:** `G6`  
-**Status:** `GATE_G6_COMPLETED`  
-**Last Updated:** `2026-10-03T21:58:00Z`  
+**Current Gate:** `SPRINT_DEMO_P0`  
+**Status:** `SPRINT_DEMO_P0_COMPLETED`  
+**Last Updated:** `2026-10-03T22:15:00Z`  
 **Governing Document:** `docs/industrial/MEGAPLAN_MUSE_API_3D_V2.md`  
 
 ---
@@ -17,11 +17,12 @@
 | **G3** | **Schemas, Data Module & Migrations** | ✅ **COMPLETED** | `industrialConfig` module registered, 13 PostgreSQL tables and 21 indexes migrated, Zod contracts, canonical hash engine, CAS revision conflict guard, tenant isolation, idempotency replay, reversible SYN fixtures, 89/89 tests passing. |
 | **G4** | **Usable Catalog & Real Evidence** | ✅ **COMPLETED** | Verified snapshots for Horner X5, NOVUS N1200, and TZone THT-02; all critical attributes anchored to manufacturer datasheets with page >= 1; exact envelopes in meters; missing circuit roles declared without fake SKUs; 108/108 tests passing. Next: G5. |
 | **G5** | **Strict Rule Evaluator Engine** | ✅ **COMPLETED** | 100% deterministic pure evaluator core, closed tri-state verdicts (`meets`, `does_not_meet`, `not_documented`), elimination of 12 false positives, strict unit conversion table, bipartite channel matching, 14 pilot rules, v1 evaluate route adapter, 272/272 tests passing. Next: G6. |
-| **G6** | **Product 3D Assets & Dimensional QA** | ✅ **COMPLETED** | glTF 2.0 binary (.glb) assets generated in exact meters (+Y up, +Z front) for all 3 pilot SKUs, Khronos glTF-Validator 0 errors/0 warnings, 0.0 mm envelope delta, PortSchema anchor alignment, CAS delivery active, PostgreSQL seeded reversibly, 100% QA tests passing. Next: G7. |
-| G7 | Industrial API v2 & Routing | ⏳ Pending | Clean `/api/industrial/v2` and `/api/muse/v2` endpoints, OpenAPI v2 specification. |
-| G8 | Engineering Bundle & Muse Payload | ⏳ Pending | Scene hints, instance placements, and immutable configuration revisions. |
-| G9 | Multi-Item Quotes & Correlated PDF | ⏳ Pending | Medusa 2 USD pricing, exact integer cents, ReportLab worker with explicit `job_id`. |
-| G10 | Web Storefront & Admin Extensions | ⏳ Pending | Next.js configuration review pages and Medusa Admin technical catalog view. |
+| **G6** | **Product 3D Assets & Dimensional QA** | ✅ **COMPLETED** | glTF 2.0 binary (.glb) assets generated in exact meters (+Y up, +Z front) for all 3 pilot SKUs, Khronos glTF-Validator 0 errors/0 warnings, 0.0 mm envelope delta, PortSchema anchor alignment, CAS delivery active, PostgreSQL seeded reversibly, 100% QA tests passing. Next: DEMO P0. |
+| **DEMO P0** | **Sprint DEMO P0 Consolidated Gate** | ✅ **COMPLETED** | Public Edge TLS on `https://data.controlnautas.com`, API v2 thin surface, Heating Chamber bundle, Medusa 2 USD preliminary quotes & PDF, Next.js `/solution` studio page. Ready for Muse Connector Test. |
+| G7 | Industrial API v2 & Routing | ⏳ Thin Complete (Full post-demo) | Clean discovery, search, detail, model3d, and strict evaluate endpoints active. |
+| G8 | Engineering Bundle & Muse Payload | ⏳ Thin Complete (Full post-demo) | Heating chamber unified bundle and scene references deployed. |
+| G9 | Multi-Item Quotes & Correlated PDF | ⏳ Lite Complete (Full post-demo) | Preliminary quotes and ReportLab PDF download active over HTTPS. |
+| G10 | Web Storefront & Admin Extensions | ⏳ Min Complete (Full post-demo) | English Solution Studio `/solution` page live in Next.js storefront. |
 | G11 | Optional Thermal Simulation | ⏳ Pending | Pure TypeScript first-order lumped model (§22.2) when requested. |
 | G12 | D1 Milestone Acceptance | ⏳ Pending | Complete integration test of catalog, evaluation, GLB delivery, and quote snapshot. |
 | G13 | Operations, Sizing & Rollback | ⏳ Pending | Backup/restore drills, metrics, and deployment verification. |
@@ -142,6 +143,23 @@
   - `b2b-backend/apps/backend/src/scripts/revert-g6-assets.ts`
   - `b2b-backend/apps/backend/src/modules/industrial-config/__tests__/g6-assets-qa.spec.ts`
 
+### Sprint DEMO P0: Public Edge, Industrial API v2, 3D Assets, Commerce & Solution Studio
+- **Date Completed:** 2026-10-03
+- **Accomplishments:**
+  - Automated deployment of public edge TLS 1.3 reverse-proxy with Let's Encrypt certificates on `https://data.controlnautas.com` (Port 80 auto-redirects to 443; raw Medusa port 9000 encapsulated).
+  - Deployed thin Industrial API v2 surface: capabilities discovery, parametric search, product technical detail, 3D model metadata, and Gate G5 strict tri-state evaluator adapter.
+  - Published authoritative OpenAPI 3.1 contract at `https://data.controlnautas.com/docs/openapi-industrial-v2-demo.yaml`.
+  - Implemented Heating Chamber unified configuration bundle endpoint (`/api/industrial/v2/configurations/heating-chamber/bundle`) linking component manifests, spatial poses, G5 evaluation, and direct GLB links.
+  - Deployed and verified Medusa 2 USD preliminary multiline BOM quotation (`/api/muse/v1/preliminary-quotes`) and ReportLab 5.0.1 signed PDF generation/download (`/api/muse/v1/quotes/{id}/pdf`).
+  - Implemented English "Industrial Solution Studio — Controlnautas Pilot" page in Next.js storefront (`/solution` and `/[countryCode]/solution`) with Meta Muse quickstart, 3D digital twins, G5 safety architecture callout, and instant quotation demo.
+  - Formalized comprehensive human operator test guide in `docs/industrial/muse-operator-demo-p0.md`.
+- **Artifacts Produced:**
+  - `docs/gates/SPRINT_DEMO_P0.md`
+  - `docs/industrial/muse-operator-demo-p0.md`
+  - `b2b-storefront/src/app/[countryCode]/(main)/solution/page.tsx`
+  - `b2b-storefront/src/app/solution/page.tsx`
+  - `b2b-storefront/public/images/industrial/*.png`
+
 ---
 
 ## 3. Open Failures and Operational Blockers
@@ -153,7 +171,7 @@
 | ~**BLK-03**~ | ~Yarn package manager not installed on EC2 host~ | **CLEARED in G1** | G1 | Enabled Yarn 4.12.0 via Corepack. |
 | ~**BLK-04**~ | ~Python `reportlab` library not installed~ | **CLEARED in G1** | G1 | Installed `reportlab==5.0.1` and `pillow==11.3.0` in `.venv`. |
 | ~**BLK-05**~ | ~ZooWork account credentials missing~ | **CLEARED in G0** | N/A | ZooWork path abandoned. Human has Muse available; Gate G2 will test GLB delivery. |
-| **BLK-06** | Meta Muse external account execution requires human operator credentials | External verification of GLB import in Meta Muse pending for G2 synthetic & G6 real pilot assets | G2 / G6 | Human operator follows `docs/industrial/g2-operator-muse-checklist.md` and `docs/industrial/g6-operator-muse-checklist.md`. Does not block Gate G7 development. |
+| **BLK-06** | Meta Muse external account execution requires human operator credentials | External verification of GLB import in Meta Muse pending for G2 synthetic & G6 real pilot assets | G2 / G6 / DEMO P0 | Server-side endpoints fully verified over HTTPS. Human operator follows `docs/industrial/muse-operator-demo-p0.md`. Does not block platform readiness. |
 
 ---
 
@@ -161,7 +179,7 @@
 
 - **Operating System:** Linux (EC2 `x86_64`, Amazon Linux 2023.12, kernel 6.18)
 - **User / Working Directory:** `ec2-user` / `/home/ec2-user/projects/hack-ecomer`
-- **Public Domain / Elastic IP:** `data.controlnautas.com` → `54.84.170.82` (Port 9000 HTTP staging active; HTTPS pending certificate setup)
+- **Public Domain / Elastic IP:** `data.controlnautas.com` → `54.84.170.82` (Let's Encrypt TLS 1.3 Active on Port 443; Nginx reverse proxy to Medusa :9000; Port 80 redirects to HTTPS)
 - **Node.js Runtime:** `v22.23.3` (Active LTS line)
 - **Package Managers:** npm `10.9.9` (`b2b-backend`), Yarn `4.12.0` (`b2b-storefront`)
 - **Python Runtime:** `3.9.25` (`.venv/bin/python3`)

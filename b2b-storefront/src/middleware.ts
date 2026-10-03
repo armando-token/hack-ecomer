@@ -27,6 +27,7 @@ const KNOWN_ROOT_ROUTES = new Set([
   "search",
   "quick-order",
   "content",
+  "solution",
 ])
 
 function checkBasicAuth(request: NextRequest): NextResponse | null {

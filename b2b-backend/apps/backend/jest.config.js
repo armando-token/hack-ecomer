@@ -27,5 +27,6 @@ if (process.env.TEST_TYPE === "integration:http") {
     "**/src/**/__tests__/**/*.unit.spec.[jt]s",
     "**/src/lib/muse/__tests__/**/*.spec.[jt]s",
     "**/src/modules/industrial-config/__tests__/**/*.spec.[jt]s",
+    "**/src/api/api/industrial/v2/__tests__/**/*.spec.[jt]s",
   ];
 }
