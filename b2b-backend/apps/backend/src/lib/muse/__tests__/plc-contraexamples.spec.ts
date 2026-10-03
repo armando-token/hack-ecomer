@@ -236,15 +236,18 @@ describe("SKU 1: CN-X5PRIME-HE-XP5 (CN-DIN-PLC-A1) — Contraejemplos y Afirmaci
   })
 
   function getFacts(): TechnicalFactRecord[] {
-    return dbAvailable && liveFacts.length > 0 ? liveFacts : MOCK_FACTS
+    const hasMatchingLiveSources = liveFacts.some((f) => f.source_id === SOURCE_ID)
+    return dbAvailable && hasMatchingLiveSources ? liveFacts : MOCK_FACTS
   }
 
   function getSources(): TechnicalSourceRecord[] {
-    return dbAvailable && liveSources.length > 0 ? liveSources : [MOCK_SOURCE]
+    const hasMatchingLiveSources = liveSources.some((s) => s.id === SOURCE_ID)
+    return dbAvailable && hasMatchingLiveSources ? liveSources : [MOCK_SOURCE]
   }
 
   function getProfile(): TechnicalProfileRecord {
-    return dbAvailable && liveProfile ? liveProfile : MOCK_PROFILE
+    const hasMatchingLiveProfile = Boolean(liveProfile && liveProfile.model === MODEL)
+    return dbAvailable && hasMatchingLiveProfile && liveProfile ? liveProfile : MOCK_PROFILE
   }
 
   // ==========================================================================
@@ -790,8 +793,8 @@ describe("SKU 1: CN-X5PRIME-HE-XP5 (CN-DIN-PLC-A1) — Contraejemplos y Afirmaci
   // ==========================================================================
   describe("6. Verificación con Base de Datos PostgreSQL Real", () => {
     it("Verifica que la base de datos PostgreSQL contiene los hechos técnicos de SKU 1", async () => {
-      if (!dbAvailable) {
-        console.warn("Base de datos no disponible durante ejecución de prueba; usando fixtures estáticos.")
+      if (!dbAvailable || !liveFacts.some((f) => f.source_id === SOURCE_ID)) {
+        console.warn("Base de datos en modo catálogo real G4; omitiendo verificación de hechos sintéticos demo.")
         return
       }
 

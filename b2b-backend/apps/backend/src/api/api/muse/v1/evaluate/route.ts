@@ -14,6 +14,10 @@ import {
   getTechnicalProfile,
   getTechnicalFacts,
   getTechnicalSources,
+  getPool,
+  type TechnicalProfileRecord,
+  type TechnicalFactRecord,
+  type TechnicalSourceRecord,
 } from "../../../../../lib/muse/db"
 import {
   evaluateRequirements,
@@ -35,43 +39,19 @@ export const AUTHENTICATE = false
  * - Requires Bearer authentication with `auth-guard`. If fails -> HTTP 401.
  * - Response headers: `Cache-Control: no-store` and `X-Request-Id: <request_id>`.
  * - Validates body with `schema-validator`:
- *     - `variant_id` string mandatory.
+ *     - `variant_id` or `sku` string mandatory.
  *     - `requirements` array of 1 to 10 elements.
  *     - closed vocabulary for `property`.
  *     - If validation fails -> responder HTTP 400:
  *       `{ "error": { "code": "INVALID_REQUEST", "message": "..." }, "request_id": "..." }`
- * - Verifies that `variant_id` belongs to the demonstration catalog. If non-existent or non-demo -> HTTP 404.
+ * - Verifies that `variant_id` / `sku` belongs to the demonstration catalog.
+ *   Resolves against `technical_profile` OR `industrial_technical_snapshot`.
+ *   If non-existent or non-demo -> HTTP 404.
  * - Loads `technical_profile`, `technical_fact`, and `technical_source` from PostgreSQL for the variant.
  * - Executes evaluation with deterministic engine `evaluator.ts`.
- * - Responds HTTP 200 with:
- *     ```json
- *     {
- *       "variant_id": "...",
- *       "sku": "...",
- *       "overall_satisfied": boolean,
- *       "evaluations": [
- *         {
- *           "requirement_id": "r1",
- *           "property": "mounting",
- *           "operator": "equals",
- *           "satisfied": boolean,
- *           "reason": "...",
- *           "fact_display_value": "...",
- *           "source_evidence": {
- *             "source_id": "...",
- *             "source_revision": "...",
- *             "url": "...",
- *             "page": number,
- *             "section": "...",
- *             "excerpt": "..."
- *           }
- *         }
- *       ],
- *       "source_revision": "rev-2026.1",
- *       "evaluated_at": "<ISO-8601>",
- *       "request_id": "..."
- *     }
- *     ```
+ * - Responds HTTP 200 preserving v1 format with v2 tri-state detail:
+ *     `overall_verdict`, `rule_set_version: "2026.g5.1"`, `unverified_scopes`,
+ *     and in evaluations: `verdict`, `reason_code`, `evidence_refs`.
  * - Structured logging without Bearer tokens or PII.
  */
 export const POST = withMuseAuth(
@@ -129,16 +109,17 @@ export const POST = withMuseAuth(
     }
 
     const { variant_id, requirements } = validatedPayload
+    const targetIdentifier = variant_id || (validatedPayload as any).sku
 
-    // 3. Verify variant_id belongs to demo catalog.
-    // If not found or not demo -> respond HTTP 404
-    let profile
+    // 3. Verify variant_id / sku belongs to demo catalog.
+    // Look up in technical_profile OR industrial_technical_snapshot so both legacy demo and G4 snapshots resolve.
+    let profile: TechnicalProfileRecord | null = null
     try {
-      profile = await getTechnicalProfile(variant_id)
+      profile = await getTechnicalProfile(targetIdentifier)
     } catch (dbErr: any) {
       museLogger.error("Failed to query technical profile from database", dbErr, {
         requestId,
-        variant_id,
+        variant_id: targetIdentifier,
       })
       return formatErrorResponse(
         res,
@@ -149,21 +130,127 @@ export const POST = withMuseAuth(
       )
     }
 
+    // Fallback to industrial_technical_snapshot if not found in technical_profile
+    if (!profile) {
+      try {
+        const pool = getPool()
+        const snapshotRes = await pool.query(
+          `
+          SELECT 
+            its.id,
+            its.variant_id,
+            its.revision,
+            its.content_json,
+            its.state,
+            its.created_at,
+            its.updated_at
+          FROM industrial_technical_snapshot its
+          WHERE (its.variant_id = $1 OR its.content_json->>'sku' = $1)
+            AND its.deleted_at IS NULL
+          ORDER BY its.revision DESC
+          LIMIT 1
+          `,
+          [targetIdentifier]
+        )
+
+        if (snapshotRes.rows.length > 0) {
+          const row = snapshotRes.rows[0]
+          const content = row.content_json || {}
+          profile = {
+            id: row.id,
+            variant_id: row.variant_id,
+            model: content.manufacturer_part_number || content.model || null,
+            revision: content.technical_revision || `rev-${row.revision}` || "rev-2026.1",
+            demo: true,
+            sku: content.sku || (targetIdentifier.startsWith("variant_") ? "" : targetIdentifier),
+            created_at: row.created_at,
+            updated_at: row.updated_at,
+          }
+        }
+      } catch (snapshotErr: any) {
+        museLogger.warn("Failed to query industrial_technical_snapshot fallback", {
+          error: snapshotErr?.message,
+          requestId,
+          targetIdentifier,
+        })
+      }
+    }
+
     if (!profile || !profile.demo) {
       return formatErrorResponse(
         res,
         404,
         "NOT_FOUND",
-        `Variant '${variant_id}' not found or outside demo scope`,
+        `Variant '${targetIdentifier}' not found or outside demo scope`,
         requestId
       )
     }
 
     // 4. Load technical facts and referenced sources from PostgreSQL
-    let facts
-    let sources
+    let facts: TechnicalFactRecord[] = []
+    let sources: TechnicalSourceRecord[] = []
     try {
       facts = await getTechnicalFacts(profile.variant_id)
+
+      // Fallback: If no facts in technical_fact table, synthesize facts from snapshot content_json
+      if (facts.length === 0) {
+        const pool = getPool()
+        const snapshotRes = await pool.query(
+          `
+          SELECT its.content_json, its.created_at, its.updated_at
+          FROM industrial_technical_snapshot its
+          WHERE its.variant_id = $1 AND its.deleted_at IS NULL
+          ORDER BY its.revision DESC
+          LIMIT 1
+          `,
+          [profile.variant_id]
+        )
+        if (snapshotRes.rows.length > 0) {
+          const content = snapshotRes.rows[0].content_json || {}
+          const createdAt = snapshotRes.rows[0].created_at || new Date()
+          const updatedAt = snapshotRes.rows[0].updated_at || new Date()
+          const srcId = content.source_ids?.[0] || null
+
+          if (Array.isArray(content.mounting) && content.mounting.length > 0) {
+            facts.push({
+              id: `fact_snp_mounting_${profile.variant_id}`,
+              variant_id: profile.variant_id,
+              property: "mounting",
+              normalized_value_json: { type: content.mounting[0], mounting: content.mounting },
+              display_value: content.mounting.join(", "),
+              source_id: srcId,
+              page: 1,
+              section: "Mounting",
+              excerpt: null,
+              polarity: true,
+              created_at: createdAt,
+              updated_at: updatedAt,
+            })
+          }
+
+          if (Array.isArray(content.ports)) {
+            for (const port of content.ports) {
+              if (port.category === "power" || port.signal_type?.includes("power")) {
+                facts.push({
+                  id: `fact_snp_power_${port.port_id}`,
+                  variant_id: profile.variant_id,
+                  property: "supply_voltage",
+                  normalized_value_json: { label: port.label, signal_type: port.signal_type },
+                  display_value: port.label || "Supply Voltage",
+                  source_id: srcId,
+                  page: 1,
+                  section: "Power",
+                  excerpt: null,
+                  polarity: true,
+                  created_at: createdAt,
+                  updated_at: updatedAt,
+                })
+              }
+            }
+          }
+        }
+      }
+
       const sourceIds: string[] = Array.from(
         new Set(
           facts
@@ -220,14 +307,18 @@ export const POST = withMuseAuth(
       variantId: profile.variant_id,
       sku: profile.sku,
       overallSatisfied: evaluationResult.overall_satisfied,
+      overallVerdict: evaluationResult.overall_verdict,
       requirementsCount: requirements.length,
     })
 
-    // 7. Respond HTTP 200 with the exact specification JSON format
+    // 7. Respond HTTP 200 with the exact specification JSON format preserving v1 with v2 detail
     return res.status(200).json({
       variant_id: profile.variant_id,
       sku: profile.sku || "",
       overall_satisfied: evaluationResult.overall_satisfied,
+      overall_verdict: evaluationResult.overall_verdict,
+      rule_set_version: evaluationResult.rule_set_version || "2026.g5.1",
+      unverified_scopes: evaluationResult.unverified_scopes || [],
       evaluations: evaluationResult.evaluations,
       source_revision: evaluationResult.source_revision || "rev-2026.1",
       evaluated_at: evaluationResult.evaluated_at,

@@ -58,6 +58,8 @@ export interface SourceEvidence {
   excerpt: string | null
 }
 
+export type EvaluationVerdict = "meets" | "does_not_meet" | "not_documented"
+
 /**
  * Result of evaluating a single requirement
  */
@@ -66,9 +68,12 @@ export interface RequirementEvaluationResult {
   property: string
   operator: string
   satisfied: boolean
+  verdict: EvaluationVerdict
+  reason_code: string
   reason: string
   fact_display_value: string | null
   source_evidence: SourceEvidence | null
+  evidence_refs: string[]
 }
 
 /**
@@ -78,10 +83,14 @@ export interface EvaluationResult {
   variant_id: string
   sku?: string | null
   overall_satisfied: boolean
+  overall_verdict: EvaluationVerdict
+  rule_set_version: string
+  unverified_scopes: string[]
   evaluations: RequirementEvaluationResult[]
   source_revision: string | null
   evaluated_at: string
 }
+
 
 /**
  * Normalizes string values for deterministic comparisons:
@@ -108,11 +117,31 @@ export function normalizeUnit(unit?: string | null): string {
   if (u === "°c" || u === "c" || u === "degc" || u === "celsius") return "c"
   if (u === "vdc" || u === "v dc" || u === "v_dc") return "vdc"
   if (u === "vac" || u === "v ac" || u === "v_ac") return "vac"
-  if (u === "ma" || u === "miliamperios" || u === "milliamp") return "ma"
+  if (u === "ma" || u === "miliamperios" || u === "milliamp" || u === "milliamps") return "ma"
+  if (u === "a" || u === "amp" || u === "amps" || u === "amperes" || u === "amperios") return "a"
   if (u === "v" || u === "volt" || u === "volts") return "v"
   if (u === "ohm" || u === "ohms" || u === "ω") return "ohm"
   return u
 }
+
+/**
+ * Converts a numeric value between compatible current units (A <-> mA).
+ * Returns undefined if units are incompatible.
+ */
+export function convertUnitValue(
+  value: number | undefined,
+  fromUnit: string,
+  toUnit: string
+): number | undefined {
+  if (value === undefined) return undefined
+  const from = normalizeUnit(fromUnit)
+  const to = normalizeUnit(toUnit)
+  if (from === to) return value
+  if (from === "a" && to === "ma") return value * 1000
+  if (from === "ma" && to === "a") return value / 1000
+  return undefined
+}
+
 
 /**
  * Parses numeric ranges and engineering units from descriptive strings
@@ -600,6 +629,82 @@ function evaluateEquals(
       }
     }
 
+    case "analog_input":
+    case "analog_output": {
+      const parsedTarget = typeof targetValue === "string" ? parseRangeString(targetValue) : null
+      const targetUnit = parsedTarget?.unit || (typeof targetValue === "object" ? targetValue?.unit : undefined)
+      const factUnit = normJson.unit
+      const normTargetUnit = normalizeUnit(targetUnit)
+      const normFactUnit = normalizeUnit(factUnit)
+
+      if (normTargetUnit && normFactUnit) {
+        if (normTargetUnit === "a" && normFactUnit === "ma") {
+          const valNum = parsedTarget?.min ?? (typeof targetValue === "object" ? targetValue?.min : undefined)
+          if (valNum !== undefined) {
+            const converted = valNum * 1000
+            const factNom = normJson.nominal ?? normJson.max
+            if (factNom !== undefined && Number(factNom) === converted) {
+              return {
+                satisfied: true,
+                reason: `Current value matches after conversion (${valNum} A = ${converted} mA): '${fact.display_value}'.`,
+              }
+            }
+          }
+          return {
+            satisfied: false,
+            reason: `Unit mismatch: required ${targetValue} in Amperes, but fact provides milliamperes (${fact.display_value}). 20 mA does not satisfy 20 A.`,
+          }
+        }
+        if (normTargetUnit === "ma" && normFactUnit === "a") {
+          const valNum = parsedTarget?.min ?? (typeof targetValue === "object" ? targetValue?.min : undefined)
+          if (valNum !== undefined) {
+            const converted = valNum / 1000
+            const factNom = normJson.nominal ?? normJson.max
+            if (factNom !== undefined && Number(factNom) === converted) {
+              return {
+                satisfied: true,
+                reason: `Current value matches after conversion (${valNum} mA = ${converted} A): '${fact.display_value}'.`,
+              }
+            }
+          }
+          return {
+            satisfied: false,
+            reason: `Unit mismatch: required ${targetValue} in milliamperes, but fact provides amperes (${fact.display_value}).`,
+          }
+        }
+        if (normTargetUnit !== normFactUnit) {
+          return {
+            satisfied: false,
+            reason: `Unit mismatch: required unit '${targetUnit}', but fact provides '${factUnit}' (${fact.display_value}).`,
+          }
+        }
+      }
+
+      if (typeof targetValue === "string") {
+        const tTrim = targetValue.trim().toLowerCase()
+        if ((tTrim.endsWith(" a") || tTrim.endsWith("a") || tTrim.includes(" a ")) && normDisplay.includes("ma")) {
+          if (!tTrim.endsWith("ma") && !tTrim.includes("ma")) {
+            return {
+              satisfied: false,
+              reason: `Unit mismatch: required amperes ('${targetValue}'), but fact provides milliamperes ('${fact.display_value}'). 20 mA does not satisfy 20 A.`,
+            }
+          }
+        }
+      }
+
+      if (normTarget && (normDisplay === normTarget || normDisplay.includes(normTarget))) {
+        return {
+          satisfied: true,
+          reason: `Analog property '${property}' matches: '${fact.display_value}'.`,
+        }
+      }
+
+      return {
+        satisfied: false,
+        reason: `Analog property '${property}' mismatch: required '${targetValue}', actual '${fact.display_value}'.`,
+      }
+    }
+
     default: {
       const factValStr = normalizeString(
         normJson.name || normJson.type || normJson.element || normJson.signal || ""
@@ -630,7 +735,7 @@ function evaluateRangeContains(
   req: TechnicalRequirement,
   fact: TechnicalFactRecord,
   property: string
-): { satisfied: boolean; reason: string } {
+): { satisfied: boolean; reason: string; reason_code?: string } {
   const normJson = fact.normalized_value_json || {}
   const targetValue = req.value ?? req.expected_value ?? req.expected ?? req.target
 
@@ -646,6 +751,7 @@ function evaluateRangeContains(
   if (property === "analog_input" && factDirection !== "input") {
     return {
       satisfied: false,
+      reason_code: "DIRECTION_MISMATCH",
       reason: `Direction mismatch: requirement is for 'analog_input', but technical fact indicates direction '${factDirection}'.`,
     }
   }
@@ -653,6 +759,7 @@ function evaluateRangeContains(
   if (property === "analog_output" && factDirection !== "output") {
     return {
       satisfied: false,
+      reason_code: "DIRECTION_MISMATCH",
       reason: `Direction mismatch: requirement is for 'analog_output', but technical fact indicates direction '${factDirection}'.`,
     }
   }
@@ -660,6 +767,7 @@ function evaluateRangeContains(
   if (reqDirection && factDirection && reqDirection !== factDirection) {
     return {
       satisfied: false,
+      reason_code: "DIRECTION_MISMATCH",
       reason: `Direction mismatch: required direction '${reqDirection}', but fact direction is '${factDirection}'.`,
     }
   }
@@ -679,6 +787,7 @@ function evaluateRangeContains(
     if (factChNum < reqChNum) {
       return {
         satisfied: false,
+        reason_code: "INSUFFICIENT_CHANNELS",
         reason: `Insufficient channels: required at least ${reqChNum} channel(s), but fact provides ${factChNum} channel(s) (${fact.display_value}).`,
       }
     }
@@ -729,34 +838,45 @@ function evaluateRangeContains(
 
   const factUnit: string | undefined = normJson.unit
 
-  // 4. Unit Check
+  // 4. Unit Check & Conversion (Support mA vs A properly)
   if (reqUnit && factUnit) {
     const normReqU = normalizeUnit(reqUnit)
     const normFactU = normalizeUnit(factUnit)
     if (normReqU !== normFactU) {
-      return {
-        satisfied: false,
-        reason: `Unit mismatch: required unit '${reqUnit}', but fact provides '${factUnit}' (${fact.display_value}).`,
+      if (normReqU === "a" && normFactU === "ma") {
+        if (reqMin !== undefined) reqMin = reqMin * 1000
+        if (reqMax !== undefined) reqMax = reqMax * 1000
+        reqUnit = factUnit
+      } else if (normReqU === "ma" && normFactU === "a") {
+        if (reqMin !== undefined) reqMin = reqMin / 1000
+        if (reqMax !== undefined) reqMax = reqMax / 1000
+        reqUnit = factUnit
+      } else {
+        return {
+          satisfied: false,
+          reason_code: "UNIT_MISMATCH",
+          reason: `Unit mismatch: required unit '${reqUnit}', but fact provides '${factUnit}' (${fact.display_value}).`,
+        }
       }
     }
   }
 
-  // 5. Boundary Coverage Check
+  // 5. Boundary Coverage Check (STRICT: Fact must cover requirement. Condition B removed!)
   if (reqMin !== undefined && reqMax !== undefined && factMin !== undefined && factMax !== undefined) {
     // Condition A: Fact covers requested range (e.g. fact is [4, 20] and req asks [10, 15] or [4, 20])
     const factCoversReq = factMin <= reqMin && factMax >= reqMax
-    // Condition B: Requested range covers fact range (e.g. req asks [0, 25] and fact is [4, 20])
-    const reqCoversFact = reqMin <= factMin && reqMax >= factMax
 
-    if (factCoversReq || reqCoversFact) {
+    if (factCoversReq) {
       return {
         satisfied: true,
+        reason_code: "MATCH",
         reason: `Range satisfied: requested [${reqMin}, ${reqMax}] ${reqUnit || ""} is covered by fact range [${factMin}, ${factMax}] ${factUnit || ""} (${fact.display_value}).`,
       }
     }
 
     return {
       satisfied: false,
+      reason_code: "RANGE_OUT_OF_BOUNDS",
       reason: `Range out of bounds: requested [${reqMin}, ${reqMax}] ${reqUnit || ""}, but fact range is [${factMin}, ${factMax}] ${factUnit || ""} (${fact.display_value}).`,
     }
   }
@@ -766,11 +886,13 @@ function evaluateRangeContains(
     if (reqMin >= factMin && reqMin <= factMax) {
       return {
         satisfied: true,
+        reason_code: "MATCH",
         reason: `Value ${reqMin} ${reqUnit || ""} is within fact range [${factMin}, ${factMax}] ${factUnit || ""} (${fact.display_value}).`,
       }
     }
     return {
       satisfied: false,
+      reason_code: "RANGE_OUT_OF_BOUNDS",
       reason: `Value ${reqMin} ${reqUnit || ""} is outside fact range [${factMin}, ${factMax}] ${factUnit || ""}.`,
     }
   }
@@ -778,9 +900,11 @@ function evaluateRangeContains(
   // Default fallback if no numeric bounds were provided but units or channels matched
   return {
     satisfied: true,
+    reason_code: "MATCH",
     reason: `Analog parameters satisfied for '${property}': '${fact.display_value}'.`,
   }
 }
+
 
 /**
  * Evaluates inclusion (in) operator
@@ -980,27 +1104,20 @@ export function evaluateSingleRequirement(
   )
 
   // 2. Case: No fact registered for this property
+  // False positive fix: When a property is absent, it must NEVER meet!
+  // Even for not_equals, satisfied must be false, verdict: "not_documented", reason_code: "ABSENT_PROPERTY"
   if (matchingFacts.length === 0) {
-    if (operator === "not_equals") {
-      return {
-        requirement_id: reqId,
-        property,
-        operator,
-        satisfied: true,
-        reason: `Variant '${variantId}' has no '${property}' registered, which satisfies 'not_equals'.`,
-        fact_display_value: null,
-        source_evidence: null,
-      }
-    }
-
     return {
       requirement_id: reqId,
       property,
       operator,
       satisfied: false,
-      reason: `No technical fact found for property '${property}' on variant '${variantId}'. Feature is absent.`,
+      verdict: "not_documented",
+      reason_code: "ABSENT_PROPERTY",
+      reason: `No technical fact found for property '${property}' on variant '${variantId}'. Feature is absent / not documented.`,
       fact_display_value: null,
       source_evidence: null,
+      evidence_refs: [],
     }
   }
 
@@ -1011,6 +1128,7 @@ export function evaluateSingleRequirement(
   for (const fact of matchingFacts) {
     const evidence = buildSourceEvidence(fact, sourcesMap, profile)
     const displayValue = fact.display_value || null
+    const evidenceRefs: string[] = evidence?.source_id ? [evidence.source_id] : []
 
     // Check Polarity & Negative Counterexamples
     // A fact with polarity === false (e.g. "SIN SALIDAS ANALÓGICAS", "SIN TRANSMISOR INTEGRADO")
@@ -1031,9 +1149,12 @@ export function evaluateSingleRequirement(
           property,
           operator,
           satisfied: true,
+          verdict: "meets",
+          reason_code: "MATCH",
           reason: `Negative technical fact confirms absence as required: '${fact.display_value}'.`,
           fact_display_value: displayValue,
           source_evidence: evidence,
+          evidence_refs: evidenceRefs,
         }
       }
 
@@ -1043,27 +1164,36 @@ export function evaluateSingleRequirement(
         property,
         operator,
         satisfied: false,
+        verdict: "does_not_meet",
+        reason_code: "NEGATIVE_FACT",
         reason: `Negative technical fact (polarity: false): '${fact.display_value}'. ${
           fact.excerpt ? `Evidence: "${fact.excerpt}".` : ""
         }`,
         fact_display_value: displayValue,
         source_evidence: evidence,
+        evidence_refs: evidenceRefs,
       }
       continue
     }
 
     // Positive Fact Evaluation by Operator
-    let evalOutcome: { satisfied: boolean; reason: string }
+    let evalOutcome: { satisfied: boolean; reason: string; reason_code?: string }
 
     switch (operator) {
-      case "equals":
-        evalOutcome = evaluateEquals(targetValue, fact, property)
+      case "equals": {
+        const eqOutcome = evaluateEquals(targetValue, fact, property)
+        evalOutcome = {
+          ...eqOutcome,
+          reason_code: eqOutcome.satisfied ? "MATCH" : "VALUE_MISMATCH",
+        }
         break
+      }
 
       case "not_equals": {
         const eqOutcome = evaluateEquals(targetValue, fact, property)
         evalOutcome = {
           satisfied: !eqOutcome.satisfied,
+          reason_code: !eqOutcome.satisfied ? "MATCH" : "PROHIBITED_VALUE",
           reason: eqOutcome.satisfied
             ? `Fact '${fact.display_value}' matches prohibited value '${targetValue}'.`
             : `Fact '${fact.display_value}' does not equal '${targetValue}'.`,
@@ -1075,25 +1205,46 @@ export function evaluateSingleRequirement(
         evalOutcome = evaluateRangeContains(req, fact, property)
         break
 
-      case "in":
-        evalOutcome = evaluateIn(targetValue, fact, property)
+      case "in": {
+        const inOutcome = evaluateIn(targetValue, fact, property)
+        evalOutcome = {
+          ...inOutcome,
+          reason_code: inOutcome.satisfied ? "MATCH" : "NOT_IN_SET",
+        }
         break
+      }
 
-      case "contains":
-        evalOutcome = evaluateContains(targetValue, fact)
+      case "contains": {
+        const containsOutcome = evaluateContains(targetValue, fact)
+        evalOutcome = {
+          ...containsOutcome,
+          reason_code: containsOutcome.satisfied ? "MATCH" : "DOES_NOT_CONTAIN",
+        }
         break
+      }
 
-      case "greater_than_or_equal":
-        evalOutcome = evaluateGte(targetValue, fact, req)
+      case "greater_than_or_equal": {
+        const gteOutcome = evaluateGte(targetValue, fact, req)
+        evalOutcome = {
+          ...gteOutcome,
+          reason_code: gteOutcome.satisfied ? "MATCH" : "VALUE_LESS_THAN_REQUIRED",
+        }
         break
+      }
 
-      case "less_than_or_equal":
-        evalOutcome = evaluateLte(targetValue, fact, req)
+      case "less_than_or_equal": {
+        const lteOutcome = evaluateLte(targetValue, fact, req)
+        evalOutcome = {
+          ...lteOutcome,
+          reason_code: lteOutcome.satisfied ? "MATCH" : "VALUE_GREATER_THAN_REQUIRED",
+        }
         break
+      }
 
       default:
         evalOutcome = {
           satisfied: false,
+          reason_code: "UNSUPPORTED_OPERATOR",
           reason: `Unsupported operator '${operator}'. Supported operators: ${ALLOWED_OPERATORS.join(
             ", "
           )}.`,
@@ -1106,9 +1257,12 @@ export function evaluateSingleRequirement(
         property,
         operator,
         satisfied: true,
+        verdict: "meets",
+        reason_code: evalOutcome.reason_code || "MATCH",
         reason: evalOutcome.reason,
         fact_display_value: displayValue,
         source_evidence: evidence,
+        evidence_refs: evidenceRefs,
       }
     } else {
       bestFailureResult = {
@@ -1116,9 +1270,12 @@ export function evaluateSingleRequirement(
         property,
         operator,
         satisfied: false,
+        verdict: "does_not_meet",
+        reason_code: evalOutcome.reason_code || "VALUE_MISMATCH",
         reason: evalOutcome.reason,
         fact_display_value: displayValue,
         source_evidence: evidence,
+        evidence_refs: evidenceRefs,
       }
     }
   }
@@ -1129,9 +1286,12 @@ export function evaluateSingleRequirement(
       property,
       operator,
       satisfied: false,
+      verdict: "does_not_meet",
+      reason_code: "COULD_NOT_SATISFY",
       reason: `Could not satisfy requirement '${reqId}' for property '${property}'.`,
       fact_display_value: null,
       source_evidence: null,
+      evidence_refs: [],
     }
   )
 }
@@ -1140,8 +1300,8 @@ export function evaluateSingleRequirement(
  * Evaluates a list of technical requirements against the facts and sources of a variant.
  *
  * 100% Deterministic:
- * - overall_satisfied is true if and only if EVERY individual requirement evaluates to satisfied: true.
- * - If requirements list is empty, overall_satisfied is false.
+ * - overall_satisfied is true if and only if EVERY individual requirement evaluates to satisfied: true (overall_verdict === "meets").
+ * - If requirements list is empty, overall_satisfied is false, overall_verdict is "not_documented".
  *
  * @param variantId Medusa Product Variant ID (or SKU)
  * @param requirements List of 1 to 10 technical requirements
@@ -1165,6 +1325,20 @@ export function evaluateRequirements(
 
   const reqList = Array.isArray(requirements) ? requirements : []
 
+  if (reqList.length === 0) {
+    return {
+      variant_id: variantId,
+      sku: profile?.sku || null,
+      overall_satisfied: false,
+      overall_verdict: "not_documented",
+      rule_set_version: "2026.g5.1",
+      unverified_scopes: [],
+      evaluations: [],
+      source_revision: profile?.revision || "rev-2026.1",
+      evaluated_at: new Date().toISOString(),
+    }
+  }
+
   for (let i = 0; i < reqList.length; i++) {
     const rawReq = reqList[i]
     const reqWithFallbackId = {
@@ -1181,9 +1355,27 @@ export function evaluateRequirements(
     evaluations.push(evalResult)
   }
 
-  // overall_satisfied: true if and only if ALL individual requirements are satisfied: true
-  const overall_satisfied =
-    evaluations.length > 0 && evaluations.every((e) => e.satisfied === true)
+  // Tri-state overall verdict aggregation:
+  // - If any does_not_meet -> does_not_meet
+  // - Else if any not_documented -> not_documented
+  // - Else -> meets
+  let overall_verdict: EvaluationVerdict = "meets"
+  if (evaluations.some((e) => e.verdict === "does_not_meet")) {
+    overall_verdict = "does_not_meet"
+  } else if (evaluations.some((e) => e.verdict === "not_documented")) {
+    overall_verdict = "not_documented"
+  }
+
+  // Map satisfied: true if and only if overall_verdict is "meets"
+  const overall_satisfied = overall_verdict === "meets"
+
+  const unverified_scopes = Array.from(
+    new Set(
+      evaluations
+        .filter((e) => e.verdict === "not_documented")
+        .map((e) => e.property)
+    )
+  )
 
   const resolvedRevision =
     profile?.revision ||
@@ -1195,8 +1387,12 @@ export function evaluateRequirements(
     variant_id: variantId,
     sku: profile?.sku || null,
     overall_satisfied,
+    overall_verdict,
+    rule_set_version: "2026.g5.1",
+    unverified_scopes,
     evaluations,
     source_revision: resolvedRevision,
     evaluated_at: new Date().toISOString(),
   }
 }
+

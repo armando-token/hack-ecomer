@@ -262,15 +262,20 @@ describe("SKU 2: CN-N1200 (CN-PID-T1) — Contraejemplos y Afirmaciones Obligato
   })
 
   function getFacts(): TechnicalFactRecord[] {
-    return dbAvailable && liveFacts.length > 0 ? liveFacts : MOCK_FACTS
+    const hasMatchingLiveContraexamples = liveFacts.some(
+      (f) => f.property === "analog_input" && f.polarity === false
+    )
+    return dbAvailable && hasMatchingLiveContraexamples ? liveFacts : MOCK_FACTS
   }
 
   function getSources(): TechnicalSourceRecord[] {
-    return dbAvailable && liveSources.length > 0 ? liveSources : [MOCK_SOURCE]
+    const hasMatchingLiveSources = liveSources.some((s) => s.id === SOURCE_ID)
+    return dbAvailable && hasMatchingLiveSources ? liveSources : [MOCK_SOURCE]
   }
 
   function getProfile(): TechnicalProfileRecord {
-    return dbAvailable && liveProfile ? liveProfile : MOCK_PROFILE
+    const hasMatchingLiveProfile = Boolean(liveProfile && liveProfile.model === MODEL)
+    return dbAvailable && hasMatchingLiveProfile && liveProfile ? liveProfile : MOCK_PROFILE
   }
 
   // ==========================================================================

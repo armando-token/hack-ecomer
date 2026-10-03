@@ -1,8 +1,8 @@
 # Project Implementation State Ledger
 
-**Current Gate:** `G4`  
-**Status:** `GATE_G4_COMPLETED`  
-**Last Updated:** `2026-10-03T21:30:00Z`  
+**Current Gate:** `G5`  
+**Status:** `GATE_G5_COMPLETED`  
+**Last Updated:** `2026-10-03T21:48:00Z`  
 **Governing Document:** `docs/industrial/MEGAPLAN_MUSE_API_3D_V2.md`  
 
 ---
@@ -16,7 +16,7 @@
 | **G2** | **Early Muse GLB Delivery Capability** | ⚠️ **PARTIAL / BLOCKED_EXTERNAL** | Standalone SYN GLB (43,276 bytes, SHA `4730b336...`) and compact proxy (2,296 bytes) created, Khronos validated (0 errors), delivery endpoints deployed with immutable cache, CORS `*`, and signed URL expiration. Awaiting human operator with Muse credentials per `g2-operator-muse-checklist.md`. Does not block G3. |
 | **G3** | **Schemas, Data Module & Migrations** | ✅ **COMPLETED** | `industrialConfig` module registered, 13 PostgreSQL tables and 21 indexes migrated, Zod contracts, canonical hash engine, CAS revision conflict guard, tenant isolation, idempotency replay, reversible SYN fixtures, 89/89 tests passing. |
 | **G4** | **Usable Catalog & Real Evidence** | ✅ **COMPLETED** | Verified snapshots for Horner X5, NOVUS N1200, and TZone THT-02; all critical attributes anchored to manufacturer datasheets with page >= 1; exact envelopes in meters; missing circuit roles declared without fake SKUs; 108/108 tests passing. Next: G5. |
-| G5 | Strict Rule Evaluator Engine | ⏳ Pending | Deterministic tri-state evaluation (`meets`, `does_not_meet`, `not_documented`) and v1 adapter. |
+| **G5** | **Strict Rule Evaluator Engine** | ✅ **COMPLETED** | 100% deterministic pure evaluator core, closed tri-state verdicts (`meets`, `does_not_meet`, `not_documented`), elimination of 12 false positives, strict unit conversion table, bipartite channel matching, 14 pilot rules, v1 evaluate route adapter, 272/272 tests passing. Next: G6. |
 | G6 | Product 3D Assets & Dimensional QA | ⏳ Pending | glTF 2.0 / GLB normalization (meters, +Y up, +Z front) and validator checks. |
 | G7 | Industrial API v2 & Routing | ⏳ Pending | Clean `/api/industrial/v2` and `/api/muse/v2` endpoints, OpenAPI v2 specification. |
 | G8 | Engineering Bundle & Muse Payload | ⏳ Pending | Scene hints, instance placements, and immutable configuration revisions. |
@@ -94,6 +94,24 @@
   - `b2b-backend/apps/backend/src/modules/industrial-config/__tests__/g4-catalog-snapshots.spec.ts`
   - `b2b-backend/apps/backend/src/scripts/seed-g4-catalog-fixtures.ts`
   - `b2b-backend/apps/backend/src/scripts/revert-g4-catalog-fixtures.ts`
+
+### Gate G5: Strict Rule Evaluator Engine & v1 Regression
+- **Date Completed:** 2026-10-03
+- **Accomplishments:**
+  - Implemented 100% deterministic pure evaluator core without external I/O in `src/modules/industrial-config/evaluator/`.
+  - Enforced closed tri-state verdict system: `meets`, `does_not_meet`, `not_documented`. Unknown/missing properties never yield overall approval.
+  - Eliminated all 12 historical false positive failure modes (missing property + `not_equals`, inverse range coverage Condition B, unit scale mismatches like 20 A vs 20 mA, supply nature VAC vs VDC, missing protocol on RS-485, unverified family option inheritance, empty requirements, open range bounds, contradictory evidence sources, missing power actuator interface in heating chamber loops, Modbus slave address collisions, and baud/parity disjoint configurations).
+  - Built unit conversion engine with closed conversion table (current, voltage, temperature, resistance, pressure, power) and strict range coverage Condition A.
+  - Built deterministic bipartite matching for channel allocation, multifunction port conflict avoidance, Modbus slave address uniqueness, and baud/parity intersection.
+  - Implemented all 14 pilot rules for the Heating Chamber process family (`IDENTITY_VARIANT`, `SIGNAL_COMPATIBILITY`, `RANGE_COVERAGE`, `PORT_DIRECTION`, `CHANNEL_CAPACITY`, `POWER_SUPPLY`, `OUTPUT_ACTUATOR_INTERFACE`, `RTD_WIRING`, `PROTOCOL_ROLE`, `BUS_PARAMETERS`, `ADDRESS_UNIQUENESS`, `MOUNTING_METHOD`, `LOGGING_CAPABILITY`, `CONTROL_LOOP_COMPLETENESS`).
+  - Adapted legacy `/api/muse/v1/evaluate` route: 100% backward compatible for v1 consumers while adding v2 tri-state details and dual resolution for both `variant_id` and `sku`.
+  - All 17 focused test suites (272 tests) passing; production build (`medusa build`) passing cleanly. Next: G6.
+- **Artifacts Produced:**
+  - `docs/gates/G5.md`
+  - `docs/industrial/g5-semantic-change-report.md`
+  - `b2b-backend/apps/backend/src/modules/industrial-config/evaluator/`
+  - `b2b-backend/apps/backend/src/modules/industrial-config/__tests__/evaluator-failure-modes.spec.ts`
+  - `b2b-backend/apps/backend/src/modules/industrial-config/__tests__/strict-evaluator-t01-t24.spec.ts`
 
 ---
 

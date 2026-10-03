@@ -236,15 +236,18 @@ describe("SKU 3: CN-THT02 (CN-RTD-P1) — Contraejemplos y Afirmaciones Obligato
   })
 
   function getFacts(): TechnicalFactRecord[] {
-    return dbAvailable && liveFacts.length > 0 ? liveFacts : MOCK_FACTS
+    const hasMatchingLiveSources = liveFacts.some((f) => f.source_id === SOURCE_ID)
+    return dbAvailable && hasMatchingLiveSources ? liveFacts : MOCK_FACTS
   }
 
   function getSources(): TechnicalSourceRecord[] {
-    return dbAvailable && liveSources.length > 0 ? liveSources : [MOCK_SOURCE]
+    const hasMatchingLiveSources = liveSources.some((s) => s.id === SOURCE_ID)
+    return dbAvailable && hasMatchingLiveSources ? liveSources : [MOCK_SOURCE]
   }
 
   function getProfile(): TechnicalProfileRecord {
-    return dbAvailable && liveProfile ? liveProfile : MOCK_PROFILE
+    const hasMatchingLiveProfile = Boolean(liveProfile && liveProfile.model === MODEL)
+    return dbAvailable && hasMatchingLiveProfile && liveProfile ? liveProfile : MOCK_PROFILE
   }
 
   // ==========================================================================

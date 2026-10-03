@@ -305,6 +305,7 @@ export interface EvaluateRequirement {
 
 export interface ValidatedEvaluatePayload {
   variant_id: string
+  sku?: string
   requirements: EvaluateRequirement[]
 }
 
@@ -320,7 +321,7 @@ export interface ValidateEvaluateOptions {
  * Validador estricto para el cuerpo de evaluación técnica (/api/muse/v1/evaluate).
  *
  * Criterios:
- * - variant_id: string no vacío.
+ * - variant_id o sku: string no vacío.
  * - requirements: array de 1 a 10 elementos inclusive.
  * - Cada requirement:
  *   - id: string no vacío.
@@ -349,8 +350,17 @@ export function validateEvaluatePayload(
 
   const raw = body as Record<string, unknown>
 
-  // 1. Validar variant_id
-  if (typeof raw.variant_id !== "string" || raw.variant_id.trim().length === 0) {
+  // 1. Validar variant_id o sku
+  const rawVariantId =
+    typeof raw.variant_id === "string" && raw.variant_id.trim().length > 0
+      ? raw.variant_id.trim()
+      : ""
+  const rawSku =
+    typeof raw.sku === "string" && raw.sku.trim().length > 0
+      ? raw.sku.trim()
+      : ""
+
+  if (!rawVariantId && !rawSku) {
     throw new MuseValidationError(
       "Field 'variant_id' is required and must be a non-empty string",
       MUSE_ERROR_CODES.INVALID_REQUEST,
@@ -358,7 +368,8 @@ export function validateEvaluatePayload(
     )
   }
 
-  const variantId = raw.variant_id.trim()
+  const variantId = rawVariantId || rawSku
+
 
   // 2. Validar requirements (array de 1 a 10 elementos)
   if (!Array.isArray(raw.requirements)) {

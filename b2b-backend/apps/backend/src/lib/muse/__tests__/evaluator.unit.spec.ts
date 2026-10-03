@@ -512,4 +512,105 @@ describe("Deterministic Technical Evaluation Engine (evaluator.ts)", () => {
       expect(evalSensor.satisfied).toBe(true)
     })
   })
+
+  describe("Gate G5 Fixes & Tri-State Engine Enhancements", () => {
+    it("not_equals on absent property NEVER meets: satisfied = false, verdict = 'not_documented', reason_code = 'ABSENT_PROPERTY'", () => {
+      const evalAbsent = evaluateSingleRequirement(
+        { id: "req_absent", property: "sensor_element", operator: "not_equals", value: "Pt100" },
+        "variant_plc_1",
+        plcFacts,
+        dummySources,
+        dummyProfile
+      )
+      expect(evalAbsent.satisfied).toBe(false)
+      expect(evalAbsent.verdict).toBe("not_documented")
+      expect(evalAbsent.reason_code).toBe("ABSENT_PROPERTY")
+      expect(evalAbsent.evidence_refs).toEqual([])
+    })
+
+    it("Inverse range coverage: [4, 20] mA CANNOT cover [0, 25] mA (Condition B removed)", () => {
+      const evalInverse = evaluateSingleRequirement(
+        { id: "req_range", property: "analog_input", operator: "range_contains", min: 0, max: 25, unit: "mA" },
+        "variant_plc_1",
+        plcFacts,
+        dummySources,
+        dummyProfile
+      )
+      expect(evalInverse.satisfied).toBe(false)
+      expect(evalInverse.verdict).toBe("does_not_meet")
+      expect(evalInverse.reason_code).toBe("RANGE_OUT_OF_BOUNDS")
+      expect(evalInverse.reason).toContain("out of bounds")
+    })
+
+    it("Unit conversion: supports mA vs A properly and rejects 20 mA vs 20 A", () => {
+      // 1. 20 mA vs 20 A in range_contains must FAIL (20 A = 20,000 mA)
+      const eval20A = evaluateSingleRequirement(
+        { id: "req_20a", property: "analog_input", operator: "range_contains", min: 20, max: 20, unit: "A" },
+        "variant_plc_1",
+        plcFacts,
+        dummySources,
+        dummyProfile
+      )
+      expect(eval20A.satisfied).toBe(false)
+      expect(eval20A.verdict).toBe("does_not_meet")
+
+      // 2. 0.004 to 0.02 A in range_contains must PASS (0.004 A = 4 mA, 0.02 A = 20 mA)
+      const evalConverted = evaluateSingleRequirement(
+        { id: "req_amp_conv", property: "analog_input", operator: "range_contains", min: 0.004, max: 0.02, unit: "A" },
+        "variant_plc_1",
+        plcFacts,
+        dummySources,
+        dummyProfile
+      )
+      expect(evalConverted.satisfied).toBe(true)
+      expect(evalConverted.verdict).toBe("meets")
+      expect(evalConverted.reason_code).toBe("MATCH")
+
+      // 3. 20 A in equals must FAIL against 4-20 mA fact
+      const evalEq20A = evaluateSingleRequirement(
+        { id: "req_eq_20a", property: "analog_input", operator: "equals", value: "20 A" },
+        "variant_plc_1",
+        plcFacts,
+        dummySources,
+        dummyProfile
+      )
+      expect(evalEq20A.satisfied).toBe(false)
+      expect(evalEq20A.verdict).toBe("does_not_meet")
+    })
+
+    it("Empty requirements: returns overall_satisfied = false, overall_verdict = 'not_documented'", () => {
+      const result = evaluateRequirements("variant_plc_1", [], plcFacts, dummySources, dummyProfile)
+      expect(result.overall_satisfied).toBe(false)
+      expect(result.overall_verdict).toBe("not_documented")
+      expect(result.rule_set_version).toBe("2026.g5.1")
+      expect(result.unverified_scopes).toEqual([])
+      expect(result.evaluations).toEqual([])
+    })
+
+    it("Outputs complete v2-ready tri-state metadata without breaking v1 shape", () => {
+      const result = evaluateRequirements(
+        "variant_plc_1",
+        [
+          { id: "r1", property: "mounting", operator: "equals", value: "DIN rail" },
+          { id: "r2", property: "sensor_element", operator: "equals", value: "Pt100" }, // absent -> not_documented
+        ],
+        plcFacts,
+        dummySources,
+        dummyProfile
+      )
+      expect(result.overall_satisfied).toBe(false)
+      expect(result.overall_verdict).toBe("not_documented")
+      expect(result.rule_set_version).toBe("2026.g5.1")
+      expect(result.unverified_scopes).toEqual(["sensor_element"])
+
+      expect(result.evaluations[0].verdict).toBe("meets")
+      expect(result.evaluations[0].reason_code).toBe("MATCH")
+      expect(result.evaluations[0].evidence_refs).toEqual(["SRC-CN-DIN-PLC-A1-DS-V1"])
+
+      expect(result.evaluations[1].verdict).toBe("not_documented")
+      expect(result.evaluations[1].reason_code).toBe("ABSENT_PROPERTY")
+      expect(result.evaluations[1].evidence_refs).toEqual([])
+    })
+  })
 })
+

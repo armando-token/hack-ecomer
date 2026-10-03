@@ -8,6 +8,7 @@ export * from "./errors"
 export * from "./hash"
 export * from "./repository"
 export * as Schemas from "./schemas"
+export * as Evaluator from "./evaluator"
 
 export default Module(INDUSTRIAL_CONFIG_MODULE, {
   service: IndustrialConfigService,

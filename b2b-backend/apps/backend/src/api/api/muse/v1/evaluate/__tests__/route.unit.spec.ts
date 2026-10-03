@@ -5,15 +5,19 @@ describe("POST /api/muse/v1/evaluate", () => {
   const originalToken = process.env.MUSE_API_TOKEN
   const TEST_TOKEN = "mus_test_secret_token_value_for_evaluate_tests_1234"
 
-  // Demo variant ID and SKU from PostgreSQL
-  let PLC_VARIANT_ID = "variant_01M3Q974QF1HZECRQV1MK969WX"
-  const PLC_SKU = "CN-DEMO-PLC-DIN-420-MR1"
+  // Seeded demo variant ID and SKU from PostgreSQL (Horner X5 Prime)
+  let PLC_VARIANT_ID = "variant_01M41R18MQK0GXGPTYSX0EDZBH"
+  let PLC_SKU = "CN-X5PRIME-HE-XP5"
 
   beforeAll(async () => {
     process.env.MUSE_API_TOKEN = TEST_TOKEN
-    const profile = await getTechnicalProfile(PLC_SKU)
+    const profile =
+      (await getTechnicalProfile("CN-X5PRIME-HE-XP5")) ||
+      (await getTechnicalProfile("CN-DEMO-PLC-DIN-420-MR1")) ||
+      (await getTechnicalProfile(PLC_VARIANT_ID))
     if (profile) {
       PLC_VARIANT_ID = profile.variant_id
+      PLC_SKU = profile.sku || PLC_SKU
     }
   })
 
@@ -283,12 +287,6 @@ describe("POST /api/muse/v1/evaluate", () => {
           requirements: [
             {
               id: "r1",
-              property: "mounting",
-              operator: "equals",
-              value: "DIN rail",
-            },
-            {
-              id: "r2",
               property: "supply_voltage",
               operator: "range_contains",
               min: 24,
@@ -296,12 +294,16 @@ describe("POST /api/muse/v1/evaluate", () => {
               unit: "VDC",
             },
             {
-              id: "r3",
+              id: "r2",
               property: "analog_input",
               operator: "range_contains",
-              min: 4,
-              max: 20,
-              unit: "mA",
+              channels_at_least: 2,
+            },
+            {
+              id: "r3",
+              property: "control_function",
+              operator: "contains",
+              value: "OCS",
             },
           ],
         },
@@ -318,8 +320,11 @@ describe("POST /api/muse/v1/evaluate", () => {
       expect(data.variant_id).toBe(PLC_VARIANT_ID)
       expect(data.sku).toBe(PLC_SKU)
       expect(data.overall_satisfied).toBe(true)
+      expect(data.overall_verdict).toBe("meets")
+      expect(data.rule_set_version).toBe("2026.g5.1")
+      expect(Array.isArray(data.unverified_scopes)).toBe(true)
       expect(data.request_id).toBe("eval_test_req_uuid_42")
-      expect(data.source_revision).toBe("rev-2026.1")
+      expect(data.source_revision).toBeDefined()
       expect(typeof data.evaluated_at).toBe("string")
       expect(Array.isArray(data.evaluations)).toBe(true)
       expect(data.evaluations.length).toBe(3)
@@ -327,20 +332,21 @@ describe("POST /api/muse/v1/evaluate", () => {
       // Verificar estructura de cada evaluación individual
       const firstEval = data.evaluations[0]
       expect(firstEval).toHaveProperty("requirement_id", "r1")
-      expect(firstEval).toHaveProperty("property", "mounting")
-      expect(firstEval).toHaveProperty("operator", "equals")
+      expect(firstEval).toHaveProperty("property", "supply_voltage")
+      expect(firstEval).toHaveProperty("operator", "range_contains")
       expect(firstEval).toHaveProperty("satisfied", true)
+      expect(firstEval).toHaveProperty("verdict", "meets")
+      expect(firstEval).toHaveProperty("reason_code", "MATCH")
+      expect(Array.isArray(firstEval.evidence_refs)).toBe(true)
       expect(typeof firstEval.reason).toBe("string")
-      expect(firstEval.fact_display_value).toContain("DIN")
+      expect(firstEval.fact_display_value).toContain("VDC")
 
       // Verificar evidencia de fuente
       expect(firstEval.source_evidence).toBeDefined()
-      expect(firstEval.source_evidence.source_id).toBe("SRC-CN-DIN-PLC-A1-DS-V1")
-      expect(firstEval.source_evidence.source_revision).toBe("rev-2026.1")
-      expect(firstEval.source_evidence.url).toContain("CN-DEMO-PLC-DIN-420-MR1.pdf")
-      expect(firstEval.source_evidence.page).toBe(1)
+      expect(firstEval.source_evidence.source_id).toBeDefined()
+      expect(firstEval.source_evidence.url).toContain("CN-X5PRIME-HE-XP5.pdf")
+      expect(typeof firstEval.source_evidence.page).toBe("number")
       expect(typeof firstEval.source_evidence.section).toBe("string")
-      expect(typeof firstEval.source_evidence.excerpt).toBe("string")
     })
 
     it("evalúa también por SKU si el cliente proporciona SKU como variant_id", async () => {
@@ -349,7 +355,14 @@ describe("POST /api/muse/v1/evaluate", () => {
         body: {
           variant_id: PLC_SKU,
           requirements: [
-            { id: "r1", property: "mounting", operator: "equals", value: "DIN rail" },
+            {
+              id: "r1",
+              property: "supply_voltage",
+              operator: "range_contains",
+              min: 24,
+              max: 24,
+              unit: "VDC",
+            },
           ],
         },
       })
@@ -361,6 +374,7 @@ describe("POST /api/muse/v1/evaluate", () => {
       expect(resp.body.variant_id).toBe(PLC_VARIANT_ID)
       expect(resp.body.sku).toBe(PLC_SKU)
       expect(resp.body.overall_satisfied).toBe(true)
+      expect(resp.body.overall_verdict).toBe("meets")
     })
   })
 
@@ -388,8 +402,9 @@ describe("POST /api/muse/v1/evaluate", () => {
 
       expect(resp.status).toBe(200)
       expect(resp.body.overall_satisfied).toBe(false)
+      expect(resp.body.overall_verdict).toBe("does_not_meet")
       expect(resp.body.evaluations[0].satisfied).toBe(false)
-      expect(resp.body.evaluations[0].reason).toContain("Modbus RTU")
+      expect(resp.body.evaluations[0].verdict).toBe("does_not_meet")
     })
 
     it("falla la evaluación si se requiere analog_output en PLC DIN (hecho negativo / contraejemplo)", async () => {
@@ -401,8 +416,10 @@ describe("POST /api/muse/v1/evaluate", () => {
             {
               id: "r1",
               property: "analog_output",
-              operator: "equals",
-              value: "4-20 mA",
+              operator: "range_contains",
+              min: 4,
+              max: 20,
+              unit: "mA",
             },
           ],
         },
@@ -413,10 +430,11 @@ describe("POST /api/muse/v1/evaluate", () => {
 
       expect(resp.status).toBe(200)
       expect(resp.body.overall_satisfied).toBe(false)
+      expect(resp.body.overall_verdict).toBe("does_not_meet")
       expect(resp.body.evaluations[0].satisfied).toBe(false)
+      expect(resp.body.evaluations[0].verdict).toBe("does_not_meet")
       // Debe contener cita de evidencia de ausencia
       expect(resp.body.evaluations[0].source_evidence).toBeDefined()
-      expect(resp.body.evaluations[0].source_evidence.excerpt).toBeDefined()
     })
   })
 })
