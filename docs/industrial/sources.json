@@ -1,10 +1,23 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "generated_at": "2026-10-03T19:15:00Z",
-  "host": "ec2-user@ip-172-31-xx-xx",
-  "environment": "EC2 Linux (Amazon Linux 2023 / kernel 6.1)",
+  "generated_at": "2026-10-03T20:21:00Z",
+  "host": "ec2-user@ip-172-31-80-36.ec2.internal",
+  "environment": "EC2 Linux (Amazon Linux 2023.12 / kernel 6.18)",
   "working_directory": "/home/ec2-user/projects/hack-ecomer",
   "sources": [
+    {
+      "id": "SRC-00",
+      "name": "MEGAPLAN_MUSE_API_3D_V2.md",
+      "type": "engineering_master_plan",
+      "path": "/home/ec2-user/projects/hack-ecomer/docs/industrial/MEGAPLAN_MUSE_API_3D_V2.md",
+      "size_bytes": 196004,
+      "sha256": "eba0fd5f9c730444151eaec757f859de8ab85225bd02f6a861a4345c8bb3fed9",
+      "timestamp": "2026-10-03T20:17:00Z",
+      "license": "Internal engineering specification",
+      "usage_scope": "Active governing master plan locking Muse conversation/3D presentation, Controlnautas Industrial API v2, Medusa 2 commerce, and gates G0-G14",
+      "review_status": "normative_governing",
+      "notes": "Governing document for Controlnautas on EC2. Locks Meta Muse for conversation/3D artifacts, Medusa/Next for industrial API v2, catalog evidence, and quotes."
+    },
     {
       "id": "SRC-01",
       "name": "hackday26_F-cursor-full-project-import-5dca.zip",
@@ -43,9 +56,9 @@
       "sha256": "cc380cc95c9f35310fc0b976c7cfb8969790110b49e90cd43225773435f2cfd9",
       "timestamp": "2026-10-03T19:10:00Z",
       "license": "Internal engineering specification",
-      "usage_scope": "Normative master plan governing architecture, gates G0-G16, schemas, ZooWork/Claude integration, 3D pipeline, and validation rules",
-      "review_status": "approved",
-      "notes": "Self-contained master plan governing Controlnautas + ZooWork + Claude + 3D Artifacts. Both path copies on disk match SHA-256 cc380cc95c9f35310fc0b976c7cfb8969790110b49e90cd43225773435f2cfd9."
+      "usage_scope": "Superseded engineering plan (ZooWork / Claude / iframe 3D architecture)",
+      "review_status": "superseded",
+      "notes": "SUPERSEDED by MEGAPLAN_MUSE_API_3D_V2.md on 2026-10-03. ZooWork path abandoned; retained only for historical traceability."
     },
     {
       "id": "SRC-04",

@@ -1,0 +1,3 @@
+# SUPERSEDED
+Replaced on 2026-10-03 by MEGAPLAN_MUSE_API_3D_V2.md (Muse path; ZooWork unavailable).
+Do not implement ZooWork gates from PLAN_MAESTRO.md.

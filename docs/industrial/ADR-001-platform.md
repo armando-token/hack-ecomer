@@ -1,86 +1,93 @@
-# ADR-001: Platform Architecture, Agent Runtime, and Authority Distribution
+# ADR-001: Platform Architecture, Muse Delegation, and Authority Distribution
 
-**Status:** Accepted (Normative — Locked Architecture)  
+**Status:** Accepted (Replaces and Supersedes ZooWork ADR-001)  
 **Date:** 2026-10-03  
 **Deciders:** Builder AI, Controlnautas Engineering Team  
-**Governing Document:** `docs/industrial/PLAN_MAESTRO.md` (§1.2, §5.2, §5.5 ADR-001)  
+**Governing Document:** `docs/industrial/MEGAPLAN_MUSE_API_3D_V2.md` (§1.1–§1.3, §2, §5, §6)  
+**Superseded Record:** Previous ADR-001 (ZooWork Managed Agents + Claude + Web Iframe 3D) dated 2026-10-03 is **SUPERSEDED**.
 
 ---
 
-## 1. Context and Problem Statement
+## 1. Supersession Notice
 
-The previous iteration of the Controlnautas project explored an experimental conversational assistant using Meta Muse on WhatsApp. While suitable for basic chat, it lacked:
-1. Native support for complex, multi-step application-executed custom tools.
-2. A durable workspace for code and asset generation.
-3. The ability to embed interactive 3D engineering models directly into the web application.
+The previous architectural decision to deploy ZooWork Managed Agents with Anthropic Claude and host an internal Three.js rendering iframe is **abandoned and superseded**. 
+ZooWork environment access is unavailable, and introducing an independent conversational orchestrator alongside an internal rendering engine created unnecessary operational complexity and architectural divergence.
 
-The project requires an architecture for conversational industrial engineering that can intake complex automation requirements, query verified technical catalog facts, deterministically evaluate engineering constraints, produce interactive 3D scene presentations, and issue commercial preliminary quotes.
+The governing architecture is now locked by `docs/industrial/MEGAPLAN_MUSE_API_3D_V2.md`.
 
 ---
 
-## 2. Decision Drivers
+## 2. Context and Problem Statement
 
-- **Commerce Integrity:** Pricing, physical inventory, and quote generation must remain under strict ACID transactional authority; LLMs must never invent prices or stock.
-- **Deterministic Engineering:** Technical feasibility checks (voltage, protocols, signal types) must be executed by pure deterministic code, not LLM token prediction.
-- **Visual Autonomy:** Interactive 3D models must render inside Controlnautas' web application under strict Content Security Policies without depending on external proprietary viewers.
-- **Security & Data Isolation:** Multiple concurrent users must not share agent workspaces, file storage, or conversational contexts.
-- **Hackathon Delivery:** P0 vertical must be demonstrable within the time budget without unnecessary operational complexity.
-
----
-
-## 3. Considered Alternatives
-
-### Alternative 1: Continue with Meta Muse / WhatsApp Integration
-- *Drawbacks:* Closed messaging environment; cannot render WebGL/Three.js scenes; impossible to provide an integrated B2B CAD/solution workspace; proprietary API constraints.
-- *Status:* **Rejected.**
-
-### Alternative 2: Direct Anthropic API (Custom Agent Orchestrator from Scratch)
-- *Drawbacks:* Disregards the platform mandate to utilize ZooWork Managed Agents; requires building durable state machines, workspace file sandboxes, and agent lifecycle infrastructure from scratch.
-- *Status:* **Rejected.**
-
-### Alternative 3: Relying on ZooWork Internal Viewer for 3D Presentations
-- *Drawbacks:* ZooWork internal viewer capabilities for WebGL, custom glTF loaders, and Three.js canvas manipulations are unverified and uncontrollable; risks runtime failures outside our network perimeter.
-- *Status:* **Rejected.**
+Controlnautas operates an industrial B2B commerce platform for automation equipment (controllers, transmitters, power interfaces, and heating solutions). Industrial customers require verified solutions rather than generic chatbot answers:
+1. Equipment selections must be backed by documented manufacturer evidence (datasheets, manuals, ports, ranges).
+2. Interconnection and operating constraints must be evaluated with deterministic tri-state logic (`meets`, `does_not_meet`, `not_documented`), not probabilistic token generation.
+3. Solutions must be presented interactively in 3D with dimensionally verified assets.
+4. Commercial quotes, inventory availability, and pricing must remain strictly transactional in USD under authoritative e-commerce control.
 
 ---
 
-## 4. Locked Decisions
+## 3. Decision Drivers
 
-### 4.1 Conversational Runtime: ZooWork Managed Agents with Explicit Claude
-- The conversational agent will run on **ZooWork Managed Agents**.
-- The model family is explicitly pinned to **Anthropic Claude** (verified from the ZooWork account model catalog in G2). Automatic model routing or silent provider fallbacks are strictly prohibited.
-- Communication with ZooWork is strictly server-to-server via the official ZooWork SDK/REST API. Client web browsers never receive ZooWork API keys or contact ZooWork endpoints directly.
-
-### 4.2 Artifact Delegation: Published on Controlnautas Web Origin
-- Claude in ZooWork outputs two paired files into its local workspace:
-  1. `scene.plan.json`: Formal scene layout specification (product placements, transforms, cables, anchor points).
-  2. `index.html`: Interactive Three.js presentation script.
-- The Controlnautas backend retrieves these files via the ZooWork Files API, validates `scene.plan.json` against the active configuration bundle, and writes them to local persistent storage (`/storage/presentations/...`).
-- Presentations are served to the user on our domain inside an isolated, sandboxed iframe (`sandbox="allow-scripts"` with no network permissions).
-
-### 4.3 Commerce Authority: Medusa 2 as Single Source of Truth
-- **Medusa 2** remains the sole authority for product models, variant identifiers, USD prices, physical stock availability, and preliminary quote persistence.
-- Agent prompts and custom tools receive live commercial data from Medusa; the agent is prohibited from generating quotes without querying the backend.
-
-### 4.4 Currency and Localization
-- All customer-facing copy, technical documentation, and user interfaces will be in **English**.
-- The canonical currency for all commercial offers and quotes is **USD** ($).
-
-### 4.5 Security Principal: Guest / Demo Operator
-- For the pilot, sessions operate under an isolated **guest / demo operator** principal.
-- Each session receives a unique, ephemeral session identifier and agent binding. Cross-session data leakage is prohibited.
-
-### 4.6 API Namespaces & Backward Compatibility
-- New industrial engineering and conversational endpoints will reside under `/api/industrial/v2`.
-- Existing endpoints under `/api/muse/v1` will remain intact to preserve backward compatibility.
+- **Zero Duplicate Chatbots:** Meta Muse handles conversational interaction, user intent parsing, and 3D artifact presentation. Controlnautas does NOT build or host a second competing conversational orchestrator.
+- **Single Source of Truth for Commerce:** Medusa 2 remains the sole authority for product models, variants, USD pricing, stock availability, and immutable quote snapshots.
+- **Deterministic Engineering Engine:** Engineering rules (voltage compatibility, protocol matching, channel capacity, power supply) run strictly in pure TypeScript services with zero LLM hallucinations.
+- **Standardized 3D Delivery:** Controlnautas delivers valid, standardized GLB assets with metadata (dimensions, anchors) to Muse. Muse renders the interactive 3D scene artifact. No server-side GPU rendering, Blender kernels, or custom web industrial renderer in the pilot.
+- **Operational Simplicity:** No FastAPI, pgvector, Elasticsearch, Neo4j, Kafka, Kubernetes, or Z3 solver in the pilot. Persistence is handled by PostgreSQL (Medusa 2 + custom module `industrial-config`).
 
 ---
 
-## 5. Consequences & Risk Mitigations
+## 4. Considered Alternatives
+
+### Alternative 1: ZooWork Managed Agents + Anthropic Claude + Web Iframe (Previous Plan)
+- *Drawbacks:* No ZooWork platform access; duplicate conversational layers; custom iframe-based 3D renderer created redundant maintenance burden outside Muse's native capabilities.
+- *Status:* **SUPERSEDED & REJECTED.**
+
+### Alternative 2: FastAPI + pgvector + Local LLM Orchestrator
+- *Drawbacks:* Violates hackathon scope constraints; excessive infrastructure footprint; non-deterministic evaluation; unneeded for a focused industrial catalog.
+- *Status:* **REJECTED.**
+
+### Alternative 3: Meta Muse for Conversation & 3D + Controlnautas Stack for Industrial API & Commerce (Chosen)
+- *Advantages:* Clear separation of concerns. Muse provides the conversational agent and native 3D artifact rendering; Controlnautas backend provides verified technical facts, deterministic rules, asset delivery, and Medusa-backed transactional commerce.
+- *Status:* **ACCEPTED.**
+
+---
+
+## 5. Locked Architecture Decisions
+
+### 5.1 System Boundary & Delegation Matrix
+
+| Responsibility | Authoritative System | Mechanism / Contract |
+|---|---|---|
+| User Conversation & Dialog Management | **Meta Muse** | Custom Muse Connector calling Controlnautas API |
+| 3D Scene Composition & Interactive Presentation | **Meta Muse** | Muse 3D Artifact utilizing Controlnautas GLB models |
+| Industrial Technical Catalog & Evidence | **Controlnautas Backend** | Snapshot registry backed by manufacturer datasheets |
+| Deterministic Engineering Evaluation | **Controlnautas Backend** | Pure TypeScript rule engine (`meets`/`does_not_meet`/`not_documented`) |
+| 3D Asset Storage & Delivery | **Controlnautas Backend** | Static / signed GLB delivery (meters, +Y up, +Z front) |
+| Commerce, Pricing & Stock Availability | **Medusa 2** | Real-time USD catalog lookup; no LLM-generated pricing |
+| Preliminary Quotes & PDF Generation | **Controlnautas Backend** | Snapshot persistence + Python ReportLab worker with `job_id` |
+| Web Catalog, Configs & Administration | **Next.js Storefront / Medusa Admin** | SSR / BFF routes, admin dashboard for technical catalog |
+
+### 5.2 API Architecture and Backward Compatibility
+- **Legacy Namespace (`/api/muse/v1`):** Retained and functional for backward compatibility. An adapter translates deterministic tri-state evaluation to legacy booleans (`meets` -> `satisfied=true`, `does_not_meet` -> `false`, `not_documented` -> `false`) while exposing additive diagnostic fields (`status`, `reason_code`).
+- **Industrial Namespace (`/api/industrial/v2` / `/api/muse/v2`):** Primary API for all new capabilities (configurations, revisions, system evaluation, GLB asset manifests, multi-item quotes, simulation data).
+
+### 5.3 Currency and Localization
+- Canonical currency: **USD** ($). Monetary values are computed using exact integer minor units (cents) with zero floating-point rounding errors.
+- Active customer-facing locale & copy: **en-US** (English).
+
+### 5.4 Security & Principal
+- Pilot security principal: **guest / demo operator**.
+- Multi-tenant isolation enforced via session identifiers and configuration ownership tokens.
+- No secrets or private Bearer tokens exposed to public client artifacts.
+
+---
+
+## 6. Consequences & Risk Mitigations
 
 | Consequence / Risk | Severity | Mitigation Strategy |
 |---|---|---|
-| Latency in ZooWork turn execution and file export | Medium | Stream intermediate turn progress to the web client via Server-Sent Events (SSE). |
-| Unsafe JavaScript in Claude-generated HTML | High | Enforce strict iframe sandbox (`sandbox="allow-scripts"`, no `allow-same-origin`) and strict CSP preventing outbound network connections. |
-| Potential floating-point errors in quote totals | High | Implement exact 2-decimal minor-unit calculations in v2 commercial modules, replacing legacy float operations. |
-| ZooWork API quota or service unavailability | High | Provide clear technical diagnostic logging and deterministic fallback states in the backend orchestrator. |
+| Muse GLB import capabilities must be validated | High | Execute early GLB delivery capability test in Gate G2 using lightweight synthetic GLB before modeling full catalog. |
+| Incompatible controller/sensor pairing requested | High | Strict tri-state rule evaluator returns explicit `does_not_meet` with citeable manufacturer evidence and missing role explanations. |
+| Potential currency or pricing discrepancies | High | Medusa 2 is authoritative; dynamic price lookups replace any static prompt values; calculations use integer cents. |
+| PDF generation concurrency | Medium | Replace unindexed FIFO worker queue with explicit `job_id` correlation or one-shot subprocess isolation. |
