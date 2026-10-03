@@ -6,7 +6,8 @@
 
 <p align="center">
   <strong>Hack AI Commerce · AI Valley</strong><br/>
-  Meta Muse converses with the engineer. Controlnautas remains the source of truth.
+  The engineer arrives with a production problem. Muse designs a plant solution.<br/>
+  Controlnautas remains the source of truth for catalog, specs, 3D, price, and quotes.
 </p>
 
 <p align="center">
@@ -29,15 +30,20 @@
 ## What this project is
 
 **Controlnautas** is a B2B industrial commerce stack (**Medusa 2** + PostgreSQL).  
-This Hack AI Commerce build exposes a **machine-readable Industrial API** so **Meta Muse** can:
+This Hack AI Commerce build exposes a **machine-readable Industrial API** so **Meta Muse** can turn a **plant problem** into an **integrated solution** — not a shopping cart of SKUs.
 
-1. **Search** real catalog products by technical intent  
+Typical client intent: *“I dry coffee beans on a conveyor and need closed-loop temperature/humidity control.”*  
+Muse should compose the loop from real catalog products (PID controller, TZone temp/RH sensor, supervisory HMI), show how they mount on the line, render them **integrated in 3D at real scale**, surface live PID/plant context, then quote only what is sellable today.
+
+The API enables Muse to:
+
+1. **Map a process need** to catalog roles (sensor → PID → power stage → heater / load)  
 2. **Evaluate** requirements with a deterministic tri-state engine (`meets` / `does_not_meet` / `not_documented`) — never “probably compatible”  
 3. **Load dimensional GLB** models (meters, +Y up, +Z forward) with honest fidelity labels  
 4. **Read OEM datasheets** over HTTPS (page-backed evidence)  
 5. **Request live USD offer / stock** from Medusa and issue a **preliminary quote PDF**
 
-There is **no second chatbot on our website**. Muse is the conversational and 3D presentation layer. Our backend is the authority for facts, geometry identity, money, and documents.
+There is **no second chatbot on our website**. Muse is the conversational and spatial layer. Our backend is the authority for facts, geometry identity, money, and documents.
 
 > Storefront UI is **intentionally deferred** for the demo: the product surface for judges and agents is the **HTTPS API + Muse**.
 
@@ -69,19 +75,21 @@ Engineer  →  Meta Muse (conversation + 3D artifact)
 
 ---
 
-## Pilot: Industrial Heating Chamber
+## Pilot solution: closed-loop thermal process
 
-| SKU | Product | Role |
+Demo process family: industrial heating / drying control (e.g. coffee-bean drying on a conveyor).
+
+| SKU | Product | Role in the loop |
 |---|---|---|
 | `CN-X5PRIME-HE-XP5` | Horner X5 Prime OCS | Supervisory HMI / PLC |
 | `CN-N1200` | NOVUS N1200 | Process PID controller |
-| `CN-THT02` | TZone THT-02 | Temp / RH transmitter |
+| `CN-THT02` | TZone THT-02 | Temp / RH transmitter on the line |
 
 **Declared missing (not sold as fake catalog items):** `actuator_power_switching` (SSR) · `thermal_load_heater`
 
 Bundle flags (honest):
-- `ready_for_3d_presentation: true`
-- `ready_for_procurement: false` while those roles are unresolved
+- `ready_for_3d_presentation: true` — show the line solution with catalog models + labeled placeholders for missing roles  
+- `ready_for_procurement: false` while SSR / heater roles are unresolved
 
 ---
 
@@ -120,15 +128,25 @@ Demo policy: **v2 engineering/3D GETs are openly readable** so judges and Muse c
 7. Request live offer / preliminary quote + PDF for catalog SKUs only  
 8. In Muse: import catalog GLBs only; keep SSR/heater as generic missing roles
 
-Suggested Muse prompt:
+Suggested Muse prompt (client problem → plant solution — not product shopping):
 
 ```text
-Use the Controlnautas Industrial API at https://data.controlnautas.com
-OpenAPI: https://data.controlnautas.com/docs/openapi-industrial-v2-demo.yaml
-Load the heating-chamber bundle, evaluate the pilot SKUs, import ONLY catalog GLBs
-(CN-X5PRIME-HE-XP5, CN-N1200, CN-THT02), open OEM PDFs for appearance, and request a
-preliminary USD quote for catalog lines. Never invent SSR/heater SKUs or prices.
+I don’t want a product comparison. I have a production problem and need a solution.
+
+Our line dries coffee beans on a conveyor. I need closed-loop control: measure
+temperature and humidity in the drying zone, run PID, and drive an electric heater
+so the process stays on setpoint while the belt runs.
+
+Use the Controlnautas API at https://data.controlnautas.com as the only source of truth.
+Design the solution from the real catalog (PID controller, TZone temp/RH sensor,
+supervisory HMI if useful). Explain install points on the line. Build an interactive 3D
+scene of the SOLUTION IN THE FACTORY at real scale (meters) — integrated equipment on a
+drying/conveyor context, not floating product cards. Show the system “alive” (PV/SP, PID
+OUT conceptually). Mark missing SSR/heater roles honestly — never invent SKUs. Then give
+live price/stock and a preliminary USD quote PDF for catalog items only.
 ```
+
+Full copy-paste variant: [`docs/industrial/muse-client-prompt-demo.md`](docs/industrial/muse-client-prompt-demo.md)
 
 ---
 
