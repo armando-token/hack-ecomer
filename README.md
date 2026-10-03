@@ -42,3 +42,7 @@ Medusa 2 · Next.js · TypeScript · PostgreSQL 16 · Python/ReportLab · Nginx 
 ## Branch
 
 Default working branch for the live demo snapshot: **`sync/ec2-demo-p0`**.
+
+## License
+
+MIT — see [LICENSE](LICENSE).
