@@ -217,5 +217,9 @@ module.exports = defineConfig({
       resolve: "./src/modules/brand",
       key: "brandModuleService",
     },
+    {
+      resolve: "./src/modules/industrial-config",
+      key: "industrialConfig",
+    },
   ]
 })

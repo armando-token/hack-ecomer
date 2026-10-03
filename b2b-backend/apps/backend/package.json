@@ -37,7 +37,9 @@
     "catalog:migrate-category-images": "npx medusa exec ./src/scripts/migrate-category-images.ts",
     "catalog:migrate-category-images:apply": "npx medusa exec ./src/scripts/migrate-category-images.ts apply",
     "seed:demo": "npx medusa exec ./src/scripts/seed-hackday-demo.ts",
-    "seed:demo:revert": "npx medusa exec ./src/scripts/revert-hackday-demo.ts"
+    "seed:demo:revert": "npx medusa exec ./src/scripts/revert-hackday-demo.ts",
+    "seed:industrial:syn": "npx medusa exec ./src/scripts/seed-syn-industrial-fixtures.ts",
+    "seed:industrial:syn:revert": "npx medusa exec ./src/scripts/revert-syn-industrial-fixtures.ts"
   },
   "dependencies": {
     "@medusajs/admin-sdk": "2.17.0",

@@ -1,8 +1,8 @@
 # Project Implementation State Ledger
 
-**Current Gate:** `G2`  
-**Status:** `GATE_G2_AWAITING_EXTERNAL_VERIFICATION`  
-**Last Updated:** `2026-10-03T20:59:00Z`  
+**Current Gate:** `G3`  
+**Status:** `GATE_G3_COMPLETED`  
+**Last Updated:** `2026-10-03T21:17:00Z`  
 **Governing Document:** `docs/industrial/MEGAPLAN_MUSE_API_3D_V2.md`  
 
 ---
@@ -14,7 +14,7 @@
 | **G0** | **Baseline, Sources & Pilot Scope** | ✅ **COMPLETED** | Working tree verified against ZIP SHA `39c46d38...`, MEGAPLAN adopted, ADR-001 rewritten for Muse, Heating Chamber selected, discrepancies documented. |
 | **G1** | **Runtime & Reproduction of Store** | ✅ **COMPLETED** | PostgreSQL 16.15 verified, Medusa DB migrated (148 tables), Corepack Yarn Berry enabled, both packages build, ReportLab PDF worker verified, live v1 routes smoked. |
 | **G2** | **Early Muse GLB Delivery Capability** | ⚠️ **PARTIAL / BLOCKED_EXTERNAL** | Standalone SYN GLB (43,276 bytes, SHA `4730b336...`) and compact proxy (2,296 bytes) created, Khronos validated (0 errors), delivery endpoints deployed with immutable cache, CORS `*`, and signed URL expiration. Awaiting human operator with Muse credentials per `g2-operator-muse-checklist.md`. Does not block G3. |
-| G3 | Schemas, Data Module & Migrations | ⏳ Pending | `industrial-config` module, PostgreSQL tables, Zod contracts, and immutable snapshots. Next actionable gate. |
+| **G3** | **Schemas, Data Module & Migrations** | ✅ **COMPLETED** | `industrialConfig` module registered, 13 PostgreSQL tables and 21 indexes migrated, Zod contracts, canonical hash engine, CAS revision conflict guard, tenant isolation, idempotency replay, reversible SYN fixtures, 89/89 tests passing. Next: G4. |
 | G4 | Usable Catalog & Real Evidence | ⏳ Pending | Verified snapshots for Horner X5, NOVUS N1200, and TZone THT-02 from official datasheets. |
 | G5 | Strict Rule Evaluator Engine | ⏳ Pending | Deterministic tri-state evaluation (`meets`, `does_not_meet`, `not_documented`) and v1 adapter. |
 | G6 | Product 3D Assets & Dimensional QA | ⏳ Pending | glTF 2.0 / GLB normalization (meters, +Y up, +Z front) and validator checks. |
@@ -60,7 +60,25 @@
   - `b2b-backend/apps/backend/src/api/api/industrial/v2/experimental/assets/...`
   - `b2b-backend/apps/backend/src/api/api/muse/v1/experimental/assets/...`
 
+### Gate G3: Schemas, Data Module & Migrations
+- **Date Completed:** 2026-10-03
+- **Accomplishments:**
+  - Medusa 2 module `industrial-config` registered under `industrialConfig` in `medusa-config.ts` and `medusa-config.js`.
+  - 13 dedicated PostgreSQL tables migrated with 21 indexes and compound UNIQUE constraints via `Migration20261003211048.ts`.
+  - Zod validation contracts implemented for physical quantities, canonical units, evidence references, ports/terminals, snapshots, assets, configurations, revisions, evaluations, exact integer-minor currency arithmetic, and quotes.
+  - Domain repository with Compare-and-Swap (CAS) revision updates (HTTP 412 `REVISION_CONFLICT`), strict tenant ownership isolation (HTTP 404 `NOT_FOUND`), and idempotency replay/conflict detection (HTTP 409 `IDEMPOTENCY_CONFLICT`).
+  - Canonical SHA-256 hash engine with stable deep key sorting and volatile signed URL token normalization.
+  - Reversible fixtures seed script `seed-syn-industrial-fixtures.ts` and rollback `revert-syn-industrial-fixtures.ts` for `SYN-IND-CTRL-01` linked to G2 SYN asset `ast_syn_ctrl_01_v1` without mutating Medusa core commerce tables.
+  - All 8 Jest test suites passing (89/89 tests) and production build passing (`medusa build`).
+- **Artifacts Produced:**
+  - `docs/gates/G3.md`
+  - `docs/industrial/g3-schema-map.md`
+  - `b2b-backend/apps/backend/src/modules/industrial-config/`
+  - `b2b-backend/apps/backend/src/scripts/seed-syn-industrial-fixtures.ts`
+  - `b2b-backend/apps/backend/src/scripts/revert-syn-industrial-fixtures.ts`
+
 ---
+
 
 ## 3. Open Failures and Operational Blockers
 
