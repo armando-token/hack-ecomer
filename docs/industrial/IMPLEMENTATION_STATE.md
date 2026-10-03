@@ -1,8 +1,8 @@
 # Project Implementation State Ledger
 
-**Current Gate:** `G3`  
-**Status:** `GATE_G3_COMPLETED`  
-**Last Updated:** `2026-10-03T21:17:00Z`  
+**Current Gate:** `G4`  
+**Status:** `GATE_G4_COMPLETED`  
+**Last Updated:** `2026-10-03T21:30:00Z`  
 **Governing Document:** `docs/industrial/MEGAPLAN_MUSE_API_3D_V2.md`  
 
 ---
@@ -14,8 +14,8 @@
 | **G0** | **Baseline, Sources & Pilot Scope** | ✅ **COMPLETED** | Working tree verified against ZIP SHA `39c46d38...`, MEGAPLAN adopted, ADR-001 rewritten for Muse, Heating Chamber selected, discrepancies documented. |
 | **G1** | **Runtime & Reproduction of Store** | ✅ **COMPLETED** | PostgreSQL 16.15 verified, Medusa DB migrated (148 tables), Corepack Yarn Berry enabled, both packages build, ReportLab PDF worker verified, live v1 routes smoked. |
 | **G2** | **Early Muse GLB Delivery Capability** | ⚠️ **PARTIAL / BLOCKED_EXTERNAL** | Standalone SYN GLB (43,276 bytes, SHA `4730b336...`) and compact proxy (2,296 bytes) created, Khronos validated (0 errors), delivery endpoints deployed with immutable cache, CORS `*`, and signed URL expiration. Awaiting human operator with Muse credentials per `g2-operator-muse-checklist.md`. Does not block G3. |
-| **G3** | **Schemas, Data Module & Migrations** | ✅ **COMPLETED** | `industrialConfig` module registered, 13 PostgreSQL tables and 21 indexes migrated, Zod contracts, canonical hash engine, CAS revision conflict guard, tenant isolation, idempotency replay, reversible SYN fixtures, 89/89 tests passing. Next: G4. |
-| G4 | Usable Catalog & Real Evidence | ⏳ Pending | Verified snapshots for Horner X5, NOVUS N1200, and TZone THT-02 from official datasheets. |
+| **G3** | **Schemas, Data Module & Migrations** | ✅ **COMPLETED** | `industrialConfig` module registered, 13 PostgreSQL tables and 21 indexes migrated, Zod contracts, canonical hash engine, CAS revision conflict guard, tenant isolation, idempotency replay, reversible SYN fixtures, 89/89 tests passing. |
+| **G4** | **Usable Catalog & Real Evidence** | ✅ **COMPLETED** | Verified snapshots for Horner X5, NOVUS N1200, and TZone THT-02; all critical attributes anchored to manufacturer datasheets with page >= 1; exact envelopes in meters; missing circuit roles declared without fake SKUs; 108/108 tests passing. Next: G5. |
 | G5 | Strict Rule Evaluator Engine | ⏳ Pending | Deterministic tri-state evaluation (`meets`, `does_not_meet`, `not_documented`) and v1 adapter. |
 | G6 | Product 3D Assets & Dimensional QA | ⏳ Pending | glTF 2.0 / GLB normalization (meters, +Y up, +Z front) and validator checks. |
 | G7 | Industrial API v2 & Routing | ⏳ Pending | Clean `/api/industrial/v2` and `/api/muse/v2` endpoints, OpenAPI v2 specification. |
@@ -76,6 +76,24 @@
   - `b2b-backend/apps/backend/src/modules/industrial-config/`
   - `b2b-backend/apps/backend/src/scripts/seed-syn-industrial-fixtures.ts`
   - `b2b-backend/apps/backend/src/scripts/revert-syn-industrial-fixtures.ts`
+
+### Gate G4: Usable Catalog & Real Evidence
+- **Date Completed:** 2026-10-03
+- **Accomplishments:**
+  - Implemented immutable `TechnicalSnapshot` definitions for Horner X5 Prime OCS (`CN-X5PRIME-HE-XP5`), NOVUS N1200 PID Controller (`CN-N1200`), and TZone THT-02 Environmental Transmitter (`CN-THT02`).
+  - Verified 100% of critical industrial attributes (supply voltage, nature, inputs, sensors, outputs, protocols, roles, baud rates, mounting, dimensions) anchored to physical manufacturer datasheets with `page >= 1`, named sections, and literal excerpts.
+  - Validated physical ports and terminal mappings against `PortSchema` with closed categories and directionalities.
+  - Verified exact metric bounding box envelopes in meters (`[0.120, 0.091, 0.060]`, `[0.048, 0.048, 0.110]`, `[0.110, 0.085, 0.040]`).
+  - Seeded snapshots and catalog entries into PostgreSQL 16.15 (`industrial_technical_snapshot` and `industrial_catalog_entry`) with reversible seed/revert scripts and zero mutation of core commerce tables.
+  - Formally cataloged missing circuit roles for the Heating Chamber process family (`process_temperature_sensor`, `power_actuator_ssr`, `electric_heater_element`, `instrument_power_supply_24vdc`, `high_limit_safety_thermostat`) enforcing the Zero Fabricated SKUs doctrine.
+  - All 9 Jest test suites passing (108/108 tests) and production build clean (`medusa build`). Next: G5.
+- **Artifacts Produced:**
+  - `docs/gates/G4.md`
+  - `docs/industrial/g4-coverage-report.md`
+  - `b2b-backend/apps/backend/src/modules/industrial-config/data/g4-catalog-snapshots.ts`
+  - `b2b-backend/apps/backend/src/modules/industrial-config/__tests__/g4-catalog-snapshots.spec.ts`
+  - `b2b-backend/apps/backend/src/scripts/seed-g4-catalog-fixtures.ts`
+  - `b2b-backend/apps/backend/src/scripts/revert-g4-catalog-fixtures.ts`
 
 ---
 

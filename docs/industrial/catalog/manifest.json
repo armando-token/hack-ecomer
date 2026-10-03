@@ -1,0 +1,743 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "schema_version": "catalog_manifest/2.0",
+  "generated_at": "2026-10-03T21:26:00Z",
+  "gate": "G4",
+  "governing_document": "docs/industrial/MEGAPLAN_MUSE_API_3D_V2.md (\u00a79, \u00a710, \u00a712, \u00a733 G4)",
+  "pilot_process": {
+    "family": "industrial_heating_chamber",
+    "name_es": "C\u00e1mara de calentamiento industrial",
+    "document_ref": "docs/industrial/pilot-process.md",
+    "required_circuit_roles": [
+      {
+        "role": "supervisory_plc_hmi",
+        "assigned_sku": "CN-X5PRIME-HE-XP5",
+        "status": "resolved"
+      },
+      {
+        "role": "process_temperature_pid_controller",
+        "assigned_sku": "CN-N1200",
+        "status": "resolved"
+      },
+      {
+        "role": "environmental_temperature_humidity_transmitter",
+        "assigned_sku": "CN-THT02",
+        "status": "resolved"
+      },
+      {
+        "role": "primary_process_temperature_probe",
+        "assigned_sku": null,
+        "status": "missing_role",
+        "notes": "Direct Pt100 RTD or Thermocouple probe required for N1200 process input"
+      },
+      {
+        "role": "power_switching_interface",
+        "assigned_sku": null,
+        "status": "missing_role",
+        "notes": "Solid State Relay (SSR) or contactor driven by N1200 I/O5 pulse or relay"
+      },
+      {
+        "role": "heating_element",
+        "assigned_sku": null,
+        "status": "missing_role",
+        "notes": "Electric resistance heating element sized for chamber thermal mass"
+      },
+      {
+        "role": "dc_instrument_power_supply",
+        "assigned_sku": null,
+        "status": "missing_role",
+        "notes": "24 VDC power supply to energize X5 Prime (10-30VDC) and THT-02 (5-24VDC)"
+      }
+    ]
+  },
+  "products": [
+    {
+      "sku": "CN-X5PRIME-HE-XP5",
+      "manufacturer": "Horner Automation",
+      "model": "HE-XP5",
+      "model_name": "X5 Prime OCS",
+      "title": "X5 Prime OCS All-in-One Controller (HE-XP5)",
+      "product_id": "prod_01M41R18HHV1C37JKN503W2ASP",
+      "variant_id": "variant_01M41R18MQK0GXGPTYSX0EDZBH",
+      "snapshot_id": "snp_cn_x5prime_he_xp5_v1",
+      "technical_revision": "MAN1363-R21-rev1",
+      "state": "published",
+      "functional_role": "supervisory_plc_hmi",
+      "derived_profile_markdown": "docs/industrial/catalog/CN-X5PRIME-HE-XP5.md",
+      "dimensions": {
+        "width_mm": 125.0,
+        "height_mm": 96.0,
+        "depth_mm": 31.0,
+        "envelope_m": [
+          0.125,
+          0.096,
+          0.031
+        ],
+        "panel_cutout_mm": [
+          119.5,
+          90.5
+        ],
+        "cutout_tolerance_mm": 0.5,
+        "evidence": {
+          "source_id": "SRC-07",
+          "page": 15,
+          "section": "Dimensions & Installation",
+          "excerpt": "X5 & X5 Prime Dimensions: 4.92\u201d (125mm) x 3.79\u201d (96mm) x 1.22\u201d (31mm)"
+        }
+      },
+      "power_supply": {
+        "primary_power_range": "10-30VDC",
+        "supply_nature": "dc",
+        "steady_state_current": "118.1mA @ 24VDC",
+        "steady_state_power_w": 2.83,
+        "inrush_current": "20A for < 1 ms @ 24VDC switched",
+        "power_class": "Class 2 required",
+        "terminals": [
+          {
+            "pin": 1,
+            "signal": "Ground",
+            "function": "Frame Ground"
+          },
+          {
+            "pin": 2,
+            "signal": "DC-",
+            "function": "Input Power Supply Ground"
+          },
+          {
+            "pin": 3,
+            "signal": "DC+",
+            "function": "Input Power Supply Voltage (10-30VDC)"
+          }
+        ],
+        "evidence": {
+          "source_id": "SRC-07",
+          "page": 2,
+          "section": "General Specifications",
+          "excerpt": "Primary Pwr. Range: 10-30VDC, Required Pwr. (steady state): 118.1mA @ 24VDC"
+        }
+      },
+      "mounting": {
+        "type": "panel_mount",
+        "mechanism": "4 mounting clips with watertight sealing gasket",
+        "protection_ratings": [
+          "Type 1",
+          "3R",
+          "4",
+          "4X",
+          "12",
+          "12K",
+          "13"
+        ],
+        "weight_g": 271,
+        "evidence": {
+          "source_id": "SRC-07",
+          "page": 16,
+          "section": "Installation Procedure"
+        }
+      },
+      "ports": [
+        {
+          "port_id": "port_pwr_in",
+          "label": "Primary Power Input (10-30 VDC)",
+          "category": "power",
+          "direction": "input",
+          "signal_type": "power_dc",
+          "terminals": [
+            {
+              "label": "Pin 1",
+              "function": "Frame Ground"
+            },
+            {
+              "label": "Pin 2",
+              "function": "DC- Ground"
+            },
+            {
+              "label": "Pin 3",
+              "function": "DC+ Voltage (10-30VDC)"
+            }
+          ]
+        },
+        {
+          "port_id": "port_di",
+          "label": "Discrete DC Inputs (%I1-%I4)",
+          "category": "discrete_input",
+          "direction": "input",
+          "signal_type": "digital_dc",
+          "terminals": [
+            {
+              "label": "%I1",
+              "function": "Digital Input 1 / HSC1"
+            },
+            {
+              "label": "%I2",
+              "function": "Digital Input 2 / HSC2"
+            },
+            {
+              "label": "%I3",
+              "function": "Digital Input 3 / HSC3"
+            },
+            {
+              "label": "%I4",
+              "function": "Digital Input 4 / HSC4"
+            },
+            {
+              "label": "Common",
+              "function": "Common Return"
+            }
+          ]
+        },
+        {
+          "port_id": "port_ai",
+          "label": "Analog Inputs (%AI1-%AI4)",
+          "category": "analog_input",
+          "direction": "input",
+          "signal_type": "current_4_20mA",
+          "terminals": [
+            {
+              "label": "%AI1",
+              "function": "Analog In 1 (0-20mA, 4-20mA, 0-10V)"
+            },
+            {
+              "label": "%AI2",
+              "function": "Analog In 2 (0-20mA, 4-20mA, 0-10V)"
+            },
+            {
+              "label": "%AI3",
+              "function": "Analog In 3 (0-20mA, 4-20mA, 0-10V)"
+            },
+            {
+              "label": "%AI4",
+              "function": "Analog In 4 (0-20mA, 4-20mA, 0-10V)"
+            }
+          ]
+        },
+        {
+          "port_id": "port_do",
+          "label": "Discrete DC Outputs (%Q1-%Q4)",
+          "category": "discrete_output",
+          "direction": "output",
+          "signal_type": "digital_dc",
+          "terminals": [
+            {
+              "label": "%Q1",
+              "function": "Digital Out 1 / PWM1 (0.5A sourcing)"
+            },
+            {
+              "label": "%Q2",
+              "function": "Digital Out 2 / PWM2 (0.5A sourcing)"
+            },
+            {
+              "label": "%Q3",
+              "function": "Digital Out 3 (0.5A sourcing)"
+            },
+            {
+              "label": "%Q4",
+              "function": "Digital Out 4 (0.5A sourcing)"
+            },
+            {
+              "label": "Vext",
+              "function": "External Power Supply (10-30VDC)"
+            }
+          ]
+        },
+        {
+          "port_id": "port_mj1_rs232",
+          "label": "Serial Port MJ1 (RS-232)",
+          "category": "serial_comm",
+          "direction": "bidirectional",
+          "signal_type": "rs232",
+          "terminals": [
+            {
+              "label": "Pin 3",
+              "function": "CTS"
+            },
+            {
+              "label": "Pin 4",
+              "function": "RTS"
+            },
+            {
+              "label": "Pin 5",
+              "function": "+5V @ 60mA Out"
+            },
+            {
+              "label": "Pin 6",
+              "function": "0V Ground"
+            },
+            {
+              "label": "Pin 7",
+              "function": "RXD"
+            },
+            {
+              "label": "Pin 8",
+              "function": "TXD"
+            }
+          ]
+        },
+        {
+          "port_id": "port_mj2_rs485",
+          "label": "Serial Port MJ2 (RS-485 Modbus RTU)",
+          "category": "serial_comm",
+          "direction": "bidirectional",
+          "signal_type": "rs485",
+          "terminals": [
+            {
+              "label": "Pin 1",
+              "function": "RX+ / TX+ (Data High)"
+            },
+            {
+              "label": "Pin 2",
+              "function": "RX- / TX- (Data Low)"
+            },
+            {
+              "label": "Pin 5",
+              "function": "+5V @ 60mA Out"
+            },
+            {
+              "label": "Pin 6",
+              "function": "0V Ground"
+            }
+          ]
+        },
+        {
+          "port_id": "port_can",
+          "label": "CAN Port (CsCAN)",
+          "category": "serial_comm",
+          "direction": "bidirectional",
+          "signal_type": "can",
+          "terminals": [
+            {
+              "label": "Pin 1",
+              "function": "CAN Data High"
+            },
+            {
+              "label": "Pin 2",
+              "function": "CAN Data Low"
+            },
+            {
+              "label": "Pins 3,6,7",
+              "function": "Ground"
+            }
+          ]
+        },
+        {
+          "port_id": "port_lan",
+          "label": "Ethernet 10/100 Port",
+          "category": "ethernet",
+          "direction": "bidirectional",
+          "signal_type": "ethernet",
+          "terminals": [
+            {
+              "label": "RJ45",
+              "function": "10/100BASE-TX Auto MDI-X"
+            }
+          ]
+        }
+      ],
+      "explicit_missing_capabilities": [
+        "NO dedicated built-in analog outputs (%AQ)",
+        "NO direct Pt100 RTD or thermocouple sensor input without external signal transmitter",
+        "Outputs CANNOT directly switch AC mains or high-current heating loads (0.5A DC max)",
+        "CANNOT run directly from AC mains power (requires 10-30 VDC power supply)",
+        "Analog inputs lack galvanic isolation"
+      ],
+      "source_documents": [
+        {
+          "source_id": "SRC-07",
+          "type": "manufacturer_datasheet",
+          "path": "docs/datasheets/CN-X5PRIME-HE-XP5.pdf",
+          "sha256": "70278736e6b8f3ab170876274a02a3ba7be0942bc2b0995bf7d5742f8bd1d742",
+          "size_bytes": 2220450,
+          "page_count": 18,
+          "revision": "MAN1363 R21"
+        }
+      ],
+      "asset_binding": {
+        "asset_id": "ast_cn_x5prime_he_xp5_ds_v1",
+        "status": "scheduled_g6",
+        "note": "GLB production and QA dimensional verification scheduled for Gate G6 per MEGAPLAN \u00a733"
+      }
+    },
+    {
+      "sku": "CN-N1200",
+      "manufacturer": "NOVUS Automation",
+      "model": "N1200",
+      "model_name": "N1200 Universal Process Controller",
+      "title": "NOVUS N1200 Universal Process Controller",
+      "product_id": "prod_01M41R18VMMN7C4V7973CRTAGR",
+      "variant_id": "variant_01M41R18XQ6QNWMX8Z39NMR2NW",
+      "snapshot_id": "snp_cn_n1200_v1",
+      "technical_revision": "UG-V2.0xQ-rev1",
+      "state": "published",
+      "functional_role": "process_temperature_pid_controller",
+      "derived_profile_markdown": "docs/industrial/catalog/CN-N1200.md",
+      "dimensions": {
+        "width_mm": 48.0,
+        "height_mm": 48.0,
+        "depth_mm": 110.0,
+        "envelope_m": [
+          0.048,
+          0.048,
+          0.11
+        ],
+        "panel_cutout_mm": [
+          45.5,
+          45.5
+        ],
+        "cutout_tolerance_mm": "+0.5/-0.0",
+        "evidence": {
+          "source_id": "SRC-08",
+          "page": 29,
+          "section": "13 Specifications",
+          "excerpt": "DIMENSIONS: 48 x 48 x 110 mm (1/16 DIN), Panel cutout: 45.5 x 45.5 mm (+0.5 -0.0 mm)"
+        }
+      },
+      "power_supply": {
+        "primary_power_range": "100-240 Vac/dc (+/-10%) 50/60 Hz",
+        "supply_nature": "universal_ac_dc",
+        "maximum_consumption_va": 9.0,
+        "terminals": [
+          {
+            "terminal": 1,
+            "signal": "Power N/-",
+            "function": "Neutral or DC Negative"
+          },
+          {
+            "terminal": 2,
+            "signal": "Power L/+",
+            "function": "Line (100-240 Vac) or DC Positive"
+          }
+        ],
+        "evidence": {
+          "source_id": "SRC-08",
+          "page": 29,
+          "section": "13 Specifications",
+          "excerpt": "POWER SUPPLY: 100 to 240 Vac/dc (\u00b110 %), 50 / 60 Hz, Maximum consumption: 9 VA"
+        }
+      },
+      "mounting": {
+        "type": "panel_mount_din_1_16",
+        "mechanism": "Rear-sliding ratchet clamp",
+        "front_protection": "IP65 (polycarbonate UL94 V-2)",
+        "rear_housing_protection": "IP20 (ABS+PC UL94 V-0)",
+        "weight_g": 150,
+        "evidence": {
+          "source_id": "SRC-08",
+          "page": 29,
+          "section": "13 Specifications"
+        }
+      },
+      "ports": [
+        {
+          "port_id": "port_pwr_in",
+          "label": "Mains Power Supply (100-240 Vac/dc)",
+          "category": "power",
+          "direction": "input",
+          "signal_type": "power_ac",
+          "terminals": [
+            {
+              "label": "Terminal 1",
+              "function": "Mains Power Neutral / DC-"
+            },
+            {
+              "label": "Terminal 2",
+              "function": "Mains Power Line / DC+"
+            }
+          ]
+        },
+        {
+          "port_id": "port_sensor_in",
+          "label": "Universal Process Sensor Input",
+          "category": "sensor",
+          "direction": "input",
+          "signal_type": "rtd_pt100",
+          "terminals": [
+            {
+              "label": "Terminal 11",
+              "function": "Pt100 Excitation / Compensation Return"
+            },
+            {
+              "label": "Terminal 12",
+              "function": "Pt100 (+), TC (+), mA (+), V (+)"
+            },
+            {
+              "label": "Terminal 13",
+              "function": "Pt100 (-), TC (-), mA (-), V (-)"
+            }
+          ]
+        },
+        {
+          "port_id": "port_io1_relay",
+          "label": "Control / Alarm Relay I/O1",
+          "category": "discrete_output",
+          "direction": "output",
+          "signal_type": "relay_contact",
+          "terminals": [
+            {
+              "label": "Terminal 3",
+              "function": "Relay 1 SPST-NO Contact"
+            },
+            {
+              "label": "Terminal 4",
+              "function": "Relay 1 SPST-NO Contact"
+            }
+          ]
+        },
+        {
+          "port_id": "port_io2_relay",
+          "label": "Control / Alarm Relay I/O2",
+          "category": "discrete_output",
+          "direction": "output",
+          "signal_type": "relay_contact",
+          "terminals": [
+            {
+              "label": "Terminal 5",
+              "function": "Relay 2 SPST-NO Contact"
+            },
+            {
+              "label": "Terminal 6",
+              "function": "Relay 2 SPST-NO Contact"
+            }
+          ]
+        },
+        {
+          "port_id": "port_io5",
+          "label": "Multi-Function Output / Retransmission I/O5",
+          "category": "analog_output",
+          "direction": "output",
+          "signal_type": "current_4_20mA",
+          "terminals": [
+            {
+              "label": "Terminal 7",
+              "function": "4-20mA Output (+) / SSR Pulse (+)"
+            },
+            {
+              "label": "Terminal 8",
+              "function": "4-20mA Output (-) / SSR Pulse (-)"
+            }
+          ]
+        },
+        {
+          "port_id": "port_remote_sp",
+          "label": "Remote Setpoint Input",
+          "category": "analog_input",
+          "direction": "input",
+          "signal_type": "current_4_20mA",
+          "terminals": [
+            {
+              "label": "Terminal 9",
+              "function": "Remote SP In (+)"
+            },
+            {
+              "label": "Terminal 10",
+              "function": "Remote SP In (-)"
+            }
+          ]
+        },
+        {
+          "port_id": "port_rs485",
+          "label": "Serial Communication RS-485",
+          "category": "serial_comm",
+          "direction": "bidirectional",
+          "signal_type": "rs485",
+          "terminals": [
+            {
+              "label": "Terminal 16",
+              "function": "D1 / A (Data +)"
+            },
+            {
+              "label": "Terminal 17",
+              "function": "D0 / B (Data -)"
+            },
+            {
+              "label": "Terminal 18",
+              "function": "Common / Shield"
+            }
+          ]
+        },
+        {
+          "port_id": "port_usb_config",
+          "label": "USB Configuration Port (Modbus RTU)",
+          "category": "serial_comm",
+          "direction": "bidirectional",
+          "signal_type": "usb",
+          "terminals": [
+            {
+              "label": "USB Mini-B",
+              "function": "CDC Class Virtual COM Port"
+            }
+          ]
+        }
+      ],
+      "explicit_missing_capabilities": [
+        "Relays CANNOT directly drive industrial heating elements (1.5A SPST max; requires intermediate SSR or contactor)",
+        "SINGLE process input channel (cannot measure 2 independent process variables simultaneously)",
+        "CANNOT interface directly with digital RS-485 sensors on input",
+        "NO native Ethernet or CAN bus",
+        "RS-485 and optional I/O are build-option dependent"
+      ],
+      "source_documents": [
+        {
+          "source_id": "SRC-08",
+          "type": "manufacturer_datasheet",
+          "path": "docs/datasheets/CN-N1200.pdf",
+          "sha256": "53384720600d70cdce641350c30b0b86ad5e44a8b37291dbaef8ee0852f86554",
+          "size_bytes": 1280893,
+          "page_count": 63,
+          "revision": "User Guide V2.0x Q"
+        }
+      ],
+      "asset_binding": {
+        "asset_id": "ast_cn_n1200_ds_v1",
+        "status": "scheduled_g6",
+        "note": "GLB production and QA dimensional verification scheduled for Gate G6 per MEGAPLAN \u00a733"
+      }
+    },
+    {
+      "sku": "CN-THT02",
+      "manufacturer": "TZone Digital",
+      "model": "THT-02",
+      "model_name": "TZ THT-02 Temperature and humidity Sensor",
+      "title": "TZ THT-02 Temperature and Humidity Sensor (RS-485 Modbus RTU)",
+      "product_id": "prod_01M41R191T79EJVV5TNEN6TAWD",
+      "variant_id": "variant_01M41R193J5MPJ16MTX9CAWWRM",
+      "snapshot_id": "snp_cn_tht02_v1",
+      "technical_revision": "UM-V1.1-rev1",
+      "state": "published",
+      "functional_role": "environmental_air_temperature_humidity_transmitter",
+      "derived_profile_markdown": "docs/industrial/catalog/CN-THT02.md",
+      "dimensions": {
+        "diameter_mm": 16.0,
+        "length_mm": 140.0,
+        "width_mm": 16.0,
+        "height_mm": 16.0,
+        "depth_mm": 140.0,
+        "envelope_m": [
+          0.016,
+          0.016,
+          0.14
+        ],
+        "panel_cutout_mm": null,
+        "evidence": {
+          "source_id": "SRC-09",
+          "page": 9,
+          "section": "7 Dimensions (unit: mm)",
+          "excerpt": "140MM length x 16MM diameter"
+        }
+      },
+      "power_supply": {
+        "primary_power_range": "5-24VDC",
+        "supply_nature": "dc",
+        "operating_current_ma": 5.0,
+        "leads": [
+          {
+            "color": "Red",
+            "signal": "V+",
+            "function": "Power supply positive (+5 to +24VDC)"
+          },
+          {
+            "color": "Black",
+            "signal": "GND",
+            "function": "Common Ground / Power negative"
+          }
+        ],
+        "evidence": {
+          "source_id": "SRC-09",
+          "page": 3,
+          "section": "4.1 Power supply",
+          "excerpt": "Supply voltage: DC 5\uff5e24V, Current: 5mA"
+        }
+      },
+      "mounting": {
+        "type": "probe_sensor",
+        "mechanism": "Cylindrical probe for air duct gland, clip, or suspension",
+        "enclosure_material": "ABS with ventilated perforated filter cap",
+        "lead_length": "Flying lead cable (4-wire: Red, Black, Yellow, Green)",
+        "evidence": {
+          "source_id": "SRC-09",
+          "page": 2,
+          "section": "1 Overview"
+        }
+      },
+      "ports": [
+        {
+          "port_id": "port_pwr_in",
+          "label": "DC Power Supply Leads",
+          "category": "power",
+          "direction": "input",
+          "signal_type": "power_dc",
+          "terminals": [
+            {
+              "label": "Red Wire",
+              "function": "V+ (+5 to +24 VDC)"
+            },
+            {
+              "label": "Black Wire",
+              "function": "GND (0 V Ground)"
+            }
+          ]
+        },
+        {
+          "port_id": "port_rs485",
+          "label": "RS-485 Modbus RTU Bus Leads",
+          "category": "serial_comm",
+          "direction": "bidirectional",
+          "signal_type": "rs485",
+          "terminals": [
+            {
+              "label": "Yellow Wire",
+              "function": "A+ (Data High / Non-inverting)"
+            },
+            {
+              "label": "Green Wire",
+              "function": "B- (Data Low / Inverting)"
+            }
+          ]
+        },
+        {
+          "port_id": "port_sensor_element",
+          "label": "Internal Sensirion SHT30 CMOSens Element",
+          "category": "sensor",
+          "direction": "input",
+          "signal_type": "sensor_sht30",
+          "terminals": [
+            {
+              "label": "Capacitive / Band-gap",
+              "function": "Temperature (-40..125 C) & Humidity (5..95 %RH)"
+            }
+          ]
+        }
+      ],
+      "explicit_missing_capabilities": [
+        "NOT a 4-20 mA current loop sensor (ZERO analog current output)",
+        "NOT a Pt100 RTD sensor (internal element is digital Sensirion SHT30)",
+        "NOT submersible in liquids (ambient air/gas only)",
+        "Enclosure and cable operating temperature limit is 85 \u00b0C max",
+        "NO onboard display or local keypad"
+      ],
+      "source_documents": [
+        {
+          "source_id": "SRC-09",
+          "type": "manufacturer_datasheet",
+          "path": "docs/datasheets/CN-THT02.pdf",
+          "sha256": "48718e71596413492f2a871e520c1567e6fe1e8abe05b89822a0f21e091e6a7c",
+          "size_bytes": 671763,
+          "page_count": 9,
+          "revision": "User Manual V1.1"
+        }
+      ],
+      "asset_binding": {
+        "asset_id": "ast_cn_tht02_ds_v1",
+        "status": "scheduled_g6",
+        "note": "GLB production and QA dimensional verification scheduled for Gate G6 per MEGAPLAN \u00a733"
+      }
+    }
+  ],
+  "summary": {
+    "total_products": 3,
+    "verified_manufacturer_sources": 3,
+    "published_profiles": 3,
+    "resolved_circuit_roles": 3,
+    "missing_circuit_roles": 4,
+    "unresolved_roles_explicitly_flagged": true
+  }
+}

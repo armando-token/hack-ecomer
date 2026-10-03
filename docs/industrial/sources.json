@@ -1,6 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "generated_at": "2026-10-03T20:21:00Z",
+  "generated_at": "2026-10-03T21:26:00Z",
+  "gate": "G4",
   "host": "ec2-user@ip-172-31-80-36.ec2.internal",
   "environment": "EC2 Linux (Amazon Linux 2023.12 / kernel 6.18)",
   "working_directory": "/home/ec2-user/projects/hack-ecomer",
@@ -65,8 +66,8 @@
       "name": "b2b-backend/package-lock.json",
       "type": "package_lock",
       "path": "/home/ec2-user/projects/hack-ecomer/b2b-backend/package-lock.json",
-      "size_bytes": 786215,
-      "sha256": "26d8af26f595f6be7d9e25369b7eb6a415d14c19bc7f39623d855e8ca35ca1a6",
+      "size_bytes": 786666,
+      "sha256": "5f348fd0eb091040a3592b9230c5b3834642763b613145a3d2845d378e1b6d95",
       "timestamp": "2026-10-01T21:29:47Z",
       "license": "N/A",
       "usage_scope": "Dependency lockfile for Medusa 2.17.0 backend monorepo workspaces",
@@ -106,11 +107,23 @@
       "path": "/home/ec2-user/projects/hack-ecomer/docs/datasheets/CN-X5PRIME-HE-XP5.pdf",
       "size_bytes": 2220450,
       "sha256": "70278736e6b8f3ab170876274a02a3ba7be0942bc2b0995bf7d5742f8bd1d742",
-      "timestamp": "2026-10-01T21:29:47Z",
+      "timestamp": "2023-07-24T00:00:00Z",
       "license": "Manufacturer public technical documentation (Horner Automation)",
       "usage_scope": "Technical ground truth for Horner X5 Prime OCS (HE-XP5) controller",
       "review_status": "verified",
-      "notes": "Official manufacturer documentation for Horner OCS X5 Prime."
+      "manufacturer": "Horner Automation",
+      "model": "HE-XP5",
+      "model_name": "X5 Prime OCS",
+      "revision": "MAN1363 R21",
+      "page_count": 18,
+      "applicable_variants": [
+        "variant_01M41R18MQK0GXGPTYSX0EDZBH"
+      ],
+      "applicable_skus": [
+        "CN-X5PRIME-HE-XP5"
+      ],
+      "derived_markdown_path": "docs/industrial/catalog/CN-X5PRIME-HE-XP5.md",
+      "notes": "Official manufacturer documentation for Horner OCS X5 Prime (MAN1363 R21, 24 JUL 2023). 18 pages. Governs dimensions (125x96x31mm, cutout 119.5x90.5mm), 10-30 VDC supply, 4 DI, 4 DO, 4 AI, RS-232/485, CAN, Ethernet."
     },
     {
       "id": "SRC-08",
@@ -119,11 +132,23 @@
       "path": "/home/ec2-user/projects/hack-ecomer/docs/datasheets/CN-N1200.pdf",
       "size_bytes": 1280893,
       "sha256": "53384720600d70cdce641350c30b0b86ad5e44a8b37291dbaef8ee0852f86554",
-      "timestamp": "2026-10-01T21:29:47Z",
+      "timestamp": "2024-01-01T00:00:00Z",
       "license": "Manufacturer public technical documentation (NOVUS Automation)",
       "usage_scope": "Technical ground truth for NOVUS N1200 Universal Process Controller",
       "review_status": "verified",
-      "notes": "Official manufacturer documentation for Novus N1200."
+      "manufacturer": "NOVUS Automation",
+      "model": "N1200",
+      "model_name": "N1200 Universal Process Controller",
+      "revision": "User Guide V2.0x Q",
+      "page_count": 63,
+      "applicable_variants": [
+        "variant_01M41R18XQ6QNWMX8Z39NMR2NW"
+      ],
+      "applicable_skus": [
+        "CN-N1200"
+      ],
+      "derived_markdown_path": "docs/industrial/catalog/CN-N1200.md",
+      "notes": "Official manufacturer documentation for NOVUS N1200 (User Guide V2.0x Q, English). 63 pages. Governs 1/16 DIN dimensions (48x48x110mm, cutout 45.5x45.5mm), 100-240 Vac/dc supply, universal input (Pt100, TC J/K/T/E/N/R/S/B, mA, V), relay/pulse/mA outputs, RS-485 Modbus RTU."
     },
     {
       "id": "SRC-09",
@@ -132,23 +157,37 @@
       "path": "/home/ec2-user/projects/hack-ecomer/docs/datasheets/CN-THT02.pdf",
       "size_bytes": 671763,
       "sha256": "48718e71596413492f2a871e520c1567e6fe1e8abe05b89822a0f21e091e6a7c",
-      "timestamp": "2026-10-01T21:29:47Z",
+      "timestamp": "2021-03-18T00:00:00Z",
       "license": "Manufacturer public technical documentation (TZone Digital)",
       "usage_scope": "Technical ground truth for TZone THT-02 Temperature/Humidity Transmitter (RS-485 Modbus RTU)",
       "review_status": "verified",
-      "notes": "Official manufacturer documentation for TZone THT-02."
+      "manufacturer": "TZone Digital",
+      "model": "THT-02",
+      "model_name": "TZ THT-02 Temperature and humidity Sensor",
+      "revision": "User Manual V1.1",
+      "page_count": 9,
+      "applicable_variants": [
+        "variant_01M41R193J5MPJ16MTX9CAWWRM"
+      ],
+      "applicable_skus": [
+        "CN-THT02"
+      ],
+      "derived_markdown_path": "docs/industrial/catalog/CN-THT02.md",
+      "notes": "Official manufacturer documentation for TZone THT-02 (User Manual V1.1, March 18th 2021). 9 pages. Governs cylindrical probe dimensions (140x16mm), 5-24 VDC supply, Sensirion SHT30 element (-40 to 125 C, 5 to 95 %RH), RS-485 Modbus RTU registers."
     },
     {
       "id": "SRC-10",
       "name": "CN-DEMO-PID-PT100-RS1.pdf",
       "type": "synthetic_datasheet",
       "path": "/home/ec2-user/projects/hack-ecomer/docs/datasheets/CN-DEMO-PID-PT100-RS1.pdf",
-      "size_bytes": 9508,
-      "sha256": "924a59a61e497c41bc114994376b7abead3f979e4c5f2c5b453921ace0654f02",
-      "timestamp": "2026-10-01T21:29:47Z",
+      "size_bytes": 9479,
+      "sha256": "2a67d406623b86e6289e7b02d9b6c0e885a6b6549a0d5dc2ac953eaeaf7bbd3d",
+      "timestamp": "2026-10-03T20:37:00Z",
       "license": "Generated for test fixtures",
       "usage_scope": "Legacy synthetic demo PID datasheet",
       "review_status": "archived_fixture",
+      "page_count": 2,
+      "applicable_variants": [],
       "notes": "Synthetic fixture; not a real manufacturer product."
     },
     {
@@ -156,12 +195,14 @@
       "name": "CN-DEMO-PLC-DIN-420-MR1.pdf",
       "type": "synthetic_datasheet",
       "path": "/home/ec2-user/projects/hack-ecomer/docs/datasheets/CN-DEMO-PLC-DIN-420-MR1.pdf",
-      "size_bytes": 9298,
-      "sha256": "8a49d1dc8776d46a97a8153117f69a9a10b73f1a6008317d3129049bb45c2fb5",
-      "timestamp": "2026-10-01T21:29:47Z",
+      "size_bytes": 9269,
+      "sha256": "a3ce919e7b2328ceb7212b0a6f9e731ab8a55ef74a6c55ccc7a3cff7c8bd99d3",
+      "timestamp": "2026-10-03T20:37:00Z",
       "license": "Generated for test fixtures",
       "usage_scope": "Legacy synthetic demo PLC datasheet",
       "review_status": "archived_fixture",
+      "page_count": 2,
+      "applicable_variants": [],
       "notes": "Synthetic fixture; not a real manufacturer product."
     },
     {
@@ -169,13 +210,231 @@
       "name": "CN-DEMO-PT100-3W-A1.pdf",
       "type": "synthetic_datasheet",
       "path": "/home/ec2-user/projects/hack-ecomer/docs/datasheets/CN-DEMO-PT100-3W-A1.pdf",
-      "size_bytes": 9443,
-      "sha256": "2e0a19487a6c2931b9e9082bc37d5bcdcf6f7803c299ec0178fe6ea6f900ee72",
-      "timestamp": "2026-10-01T21:29:47Z",
+      "size_bytes": 9414,
+      "sha256": "99f1a79829e50ce01c2d18082c162b398ad33a1ad96aa57e18c0561f0d2dffc1",
+      "timestamp": "2026-10-03T20:37:00Z",
       "license": "Generated for test fixtures",
       "usage_scope": "Legacy synthetic demo PT100 sensor datasheet",
       "review_status": "archived_fixture",
+      "page_count": 2,
+      "applicable_variants": [],
       "notes": "Synthetic fixture; distinct from real THT-02 sensor."
+    },
+    {
+      "id": "SRC-13",
+      "name": "SPEC_X5_PRIME.md",
+      "type": "markdown_spec",
+      "path": "/home/ec2-user/projects/hack-ecomer/docs/demo-docs/x5prime/SPEC_X5_PRIME.md",
+      "size_bytes": 2024,
+      "sha256": "a3bf7d3e663c6d8c7f94daad32063a765b8a43d7f392ed2e198d13889cea1e10",
+      "timestamp": "2026-10-01T21:29:47Z",
+      "license": "Internal documentation conversion",
+      "usage_scope": "Compact Markdown specification for Horner X5 Prime OCS",
+      "review_status": "verified",
+      "applicable_variants": [
+        "variant_01M41R18MQK0GXGPTYSX0EDZBH"
+      ]
+    },
+    {
+      "id": "SRC-14",
+      "name": "X5_Prime_Datasheet.md",
+      "type": "markdown_documentation",
+      "path": "/home/ec2-user/projects/hack-ecomer/docs/demo-docs/x5prime/X5_Prime_Datasheet.md",
+      "size_bytes": 29788,
+      "sha256": "688c2d7bc88fef42da0e555306221717c7d32804e1d0bd07b6bcd291d77007d9",
+      "timestamp": "2026-10-01T21:29:47Z",
+      "license": "Internal documentation conversion",
+      "usage_scope": "Full Markdown conversion of Horner MAN1363 R21 datasheet",
+      "review_status": "verified",
+      "applicable_variants": [
+        "variant_01M41R18MQK0GXGPTYSX0EDZBH"
+      ]
+    },
+    {
+      "id": "SRC-15",
+      "name": "X5_Prime_Quick_Reference.md",
+      "type": "markdown_documentation",
+      "path": "/home/ec2-user/projects/hack-ecomer/docs/demo-docs/x5prime/X5_Prime_Quick_Reference.md",
+      "size_bytes": 47992,
+      "sha256": "0178e9e778139c2dd8f587881d5c495b1bb6659512b314966cc11a85d463c14f",
+      "timestamp": "2026-10-01T21:29:47Z",
+      "license": "Internal documentation conversion",
+      "usage_scope": "Quick reference guide for Horner X5 Prime OCS",
+      "review_status": "verified",
+      "applicable_variants": [
+        "variant_01M41R18MQK0GXGPTYSX0EDZBH"
+      ]
+    },
+    {
+      "id": "SRC-16",
+      "name": "X5_Prime_User_Manual.md",
+      "type": "markdown_documentation",
+      "path": "/home/ec2-user/projects/hack-ecomer/docs/demo-docs/x5prime/X5_Prime_User_Manual.md",
+      "size_bytes": 349279,
+      "sha256": "8b7b4a72702343d9ffd88871a6c2f398eafe49e89b127c207c239bfc7f0e9d2a",
+      "timestamp": "2026-10-01T21:29:47Z",
+      "license": "Internal documentation conversion",
+      "usage_scope": "Full user manual conversion for Horner X5 Prime OCS (MAN1039)",
+      "review_status": "verified",
+      "applicable_variants": [
+        "variant_01M41R18MQK0GXGPTYSX0EDZBH"
+      ]
+    },
+    {
+      "id": "SRC-17",
+      "name": "N1200_User_Guide.md",
+      "type": "markdown_documentation",
+      "path": "/home/ec2-user/projects/hack-ecomer/docs/demo-docs/n1200/N1200_User_Guide.md",
+      "size_bytes": 221330,
+      "sha256": "24dc81d9cab862fc197962e785ba561dffb885e0549bd17e4f929e09873be957",
+      "timestamp": "2026-10-01T21:29:47Z",
+      "license": "Internal documentation conversion",
+      "usage_scope": "Full Markdown conversion of NOVUS N1200 User Guide V2.0x Q",
+      "review_status": "verified",
+      "applicable_variants": [
+        "variant_01M41R18XQ6QNWMX8Z39NMR2NW"
+      ]
+    },
+    {
+      "id": "SRC-18",
+      "name": "NOVUS_Controllers_Selection_Guide.md",
+      "type": "markdown_documentation",
+      "path": "/home/ec2-user/projects/hack-ecomer/docs/demo-docs/n1200/NOVUS_Controllers_Selection_Guide.md",
+      "size_bytes": 21679,
+      "sha256": "4d56baabf0b23aa5ab328db058d483abfec0b855741f97d524fc68fdefbcebb8",
+      "timestamp": "2026-10-01T21:29:47Z",
+      "license": "Internal documentation conversion",
+      "usage_scope": "NOVUS controllers family comparison and selection guide",
+      "review_status": "verified",
+      "applicable_variants": [
+        "variant_01M41R18XQ6QNWMX8Z39NMR2NW"
+      ]
+    },
+    {
+      "id": "SRC-19",
+      "name": "SPEC_N1200.md",
+      "type": "markdown_spec",
+      "path": "/home/ec2-user/projects/hack-ecomer/docs/demo-docs/n1200/SPEC_N1200.md",
+      "size_bytes": 2220,
+      "sha256": "5282bcd48781c32040b9e76a9174bd9504182e1c8c14465bcf936ba0dbbc8aed",
+      "timestamp": "2026-10-01T21:29:47Z",
+      "license": "Internal documentation conversion",
+      "usage_scope": "Compact Markdown specification for NOVUS N1200 controller",
+      "review_status": "verified",
+      "applicable_variants": [
+        "variant_01M41R18XQ6QNWMX8Z39NMR2NW"
+      ]
+    },
+    {
+      "id": "SRC-20",
+      "name": "SPEC_THT02.md",
+      "type": "markdown_spec",
+      "path": "/home/ec2-user/projects/hack-ecomer/docs/demo-docs/tht02/SPEC_THT02.md",
+      "size_bytes": 1757,
+      "sha256": "b45ba28ec5a7da07c4df6664bb38fddbad6c5c43e612955ac9064e0a4d957b20",
+      "timestamp": "2026-10-01T21:29:47Z",
+      "license": "Internal documentation conversion",
+      "usage_scope": "Compact Markdown specification for TZone THT-02 sensor",
+      "review_status": "verified",
+      "applicable_variants": [
+        "variant_01M41R193J5MPJ16MTX9CAWWRM"
+      ]
+    },
+    {
+      "id": "SRC-21",
+      "name": "THT02_User_Manual.md",
+      "type": "markdown_documentation",
+      "path": "/home/ec2-user/projects/hack-ecomer/docs/demo-docs/tht02/THT02_User_Manual.md",
+      "size_bytes": 15565,
+      "sha256": "084f9aa3ed2f5131389aef78f6697752123ada76bcd8f8f6242d9886d810e79c",
+      "timestamp": "2026-10-01T21:29:47Z",
+      "license": "Internal documentation conversion",
+      "usage_scope": "Full Markdown conversion of TZone THT-02 User Manual V1.1",
+      "review_status": "verified",
+      "applicable_variants": [
+        "variant_01M41R193J5MPJ16MTX9CAWWRM"
+      ]
+    },
+    {
+      "id": "SRC-22",
+      "name": "CN-DEMO-PID-PT100-RS1.md",
+      "type": "synthetic_spec",
+      "path": "/home/ec2-user/projects/hack-ecomer/docs/demo-specs/CN-DEMO-PID-PT100-RS1.md",
+      "size_bytes": 9777,
+      "sha256": "21c024a62339881ebf79877e94c9ef5ab9cd397919aa0d2a78b6ca13b38ad16d",
+      "timestamp": "2026-10-01T21:29:47Z",
+      "license": "Generated for test fixtures",
+      "usage_scope": "Synthetic test fixture spec for PID controller",
+      "review_status": "archived_fixture"
+    },
+    {
+      "id": "SRC-23",
+      "name": "CN-DEMO-PLC-DIN-420-MR1.md",
+      "type": "synthetic_spec",
+      "path": "/home/ec2-user/projects/hack-ecomer/docs/demo-specs/CN-DEMO-PLC-DIN-420-MR1.md",
+      "size_bytes": 8879,
+      "sha256": "accada3ac811211e8f03ddd4cdbee9a77df0b95b38e7beea1dc0bb513dfd0662",
+      "timestamp": "2026-10-01T21:29:47Z",
+      "license": "Generated for test fixtures",
+      "usage_scope": "Synthetic test fixture spec for DIN rail PLC",
+      "review_status": "archived_fixture"
+    },
+    {
+      "id": "SRC-24",
+      "name": "CN-DEMO-PT100-3W-A1.md",
+      "type": "synthetic_spec",
+      "path": "/home/ec2-user/projects/hack-ecomer/docs/demo-specs/CN-DEMO-PT100-3W-A1.md",
+      "size_bytes": 10043,
+      "sha256": "639f4855f4bb84630e2606beaed0367a6722be3fdd4afda2a5d4d18743a8247a",
+      "timestamp": "2026-10-01T21:29:47Z",
+      "license": "Generated for test fixtures",
+      "usage_scope": "Synthetic test fixture spec for 3-wire PT100 probe",
+      "review_status": "archived_fixture"
+    },
+    {
+      "id": "SRC-25",
+      "name": "CN-X5PRIME-HE-XP5.md (catalog profile)",
+      "type": "derived_catalog_profile",
+      "path": "/home/ec2-user/projects/hack-ecomer/docs/industrial/catalog/CN-X5PRIME-HE-XP5.md",
+      "size_bytes": 14871,
+      "sha256": "9915a33e8decfad46ba2fec0cd129b2718f0470f8224c967183ea7439fed4cf4",
+      "timestamp": "2026-10-03T21:25:00Z",
+      "license": "Derived engineering profile",
+      "usage_scope": "Authoritative technical profile for Horner X5 Prime OCS (Gate G4)",
+      "review_status": "verified",
+      "applicable_variants": [
+        "variant_01M41R18MQK0GXGPTYSX0EDZBH"
+      ]
+    },
+    {
+      "id": "SRC-26",
+      "name": "CN-N1200.md (catalog profile)",
+      "type": "derived_catalog_profile",
+      "path": "/home/ec2-user/projects/hack-ecomer/docs/industrial/catalog/CN-N1200.md",
+      "size_bytes": 14065,
+      "sha256": "7a2aca5c4910b9ad6b0582bb187e2a2dc770ec8a56da56f46053c05edd721004",
+      "timestamp": "2026-10-03T21:25:00Z",
+      "license": "Derived engineering profile",
+      "usage_scope": "Authoritative technical profile for NOVUS N1200 Process Controller (Gate G4)",
+      "review_status": "verified",
+      "applicable_variants": [
+        "variant_01M41R18XQ6QNWMX8Z39NMR2NW"
+      ]
+    },
+    {
+      "id": "SRC-27",
+      "name": "CN-THT02.md (catalog profile)",
+      "type": "derived_catalog_profile",
+      "path": "/home/ec2-user/projects/hack-ecomer/docs/industrial/catalog/CN-THT02.md",
+      "size_bytes": 11491,
+      "sha256": "fe9d5e5266bf2b270e092049bc9a8e7850a8638f05c10df287df2f81021fde3b",
+      "timestamp": "2026-10-03T21:25:00Z",
+      "license": "Derived engineering profile",
+      "usage_scope": "Authoritative technical profile for TZone THT-02 Transmitter (Gate G4)",
+      "review_status": "verified",
+      "applicable_variants": [
+        "variant_01M41R193J5MPJ16MTX9CAWWRM"
+      ]
     }
   ]
 }
