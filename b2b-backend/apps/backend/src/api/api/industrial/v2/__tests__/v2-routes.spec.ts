@@ -106,6 +106,15 @@ describe("Industrial API v2 - Meta Muse Architecture Demo Suite", () => {
       expect(body.search.supported_filters).toContain("mounting_type")
       expect(body.search.supported_filters).toContain("has_model3d")
 
+      // Commercial
+      expect(body.commercial).toBeDefined()
+      expect(body.commercial.currency).toBe("USD")
+      expect(body.commercial.supports_live_pricing).toBe(true)
+      expect(body.commercial.supports_live_inventory).toBe(true)
+      expect(body.commercial.supports_multiline_quotes).toBe(true)
+      expect(body.commercial.supports_pdf_generation).toBe(true)
+      expect(body.commercial.pricing_scale).toBe(2)
+
       // Models 3D
       expect(body.models_3d).toBeDefined()
       expect(body.models_3d.supported_format).toBe("model/gltf-binary")
@@ -129,8 +138,11 @@ describe("Industrial API v2 - Meta Muse Architecture Demo Suite", () => {
         "products/search",
         "products/{idOrSku}",
         "products/{idOrSku}/model3d",
+        "products/{idOrSku}/offer",
         "evaluate",
         "configurations/heating-chamber/bundle",
+        "preliminary-quotes",
+        "quotes/{quoteId}/pdf",
       ])
     })
 

@@ -35,6 +35,7 @@ components:
         - process_families
         - pilot_skus
         - search
+        - commercial
         - models_3d
         - evaluation
         - auth
@@ -73,6 +74,34 @@ components:
             default_limit:
               type: integer
               example: 10
+        commercial:
+          type: object
+          required:
+            - currency
+            - supports_live_pricing
+            - supports_live_inventory
+            - supports_multiline_quotes
+            - supports_pdf_generation
+            - pricing_scale
+          properties:
+            currency:
+              type: string
+              example: "USD"
+            supports_live_pricing:
+              type: boolean
+              example: true
+            supports_live_inventory:
+              type: boolean
+              example: true
+            supports_multiline_quotes:
+              type: boolean
+              example: true
+            supports_pdf_generation:
+              type: boolean
+              example: true
+            pricing_scale:
+              type: integer
+              example: 2
         models_3d:
           type: object
           required:

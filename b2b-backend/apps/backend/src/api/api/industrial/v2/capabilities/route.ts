@@ -24,6 +24,14 @@ export const CAPABILITIES_RESPONSE = {
     max_limit: 50,
     default_limit: 10,
   },
+  commercial: {
+    currency: "USD",
+    supports_live_pricing: true,
+    supports_live_inventory: true,
+    supports_multiline_quotes: true,
+    supports_pdf_generation: true,
+    pricing_scale: 2,
+  },
   models_3d: {
     supported_format: "model/gltf-binary",
     coordinate_system: "right_handed_y_up_z_forward",
@@ -44,8 +52,11 @@ export const CAPABILITIES_RESPONSE = {
       "products/search",
       "products/{idOrSku}",
       "products/{idOrSku}/model3d",
+      "products/{idOrSku}/offer",
       "evaluate",
       "configurations/heating-chamber/bundle",
+      "preliminary-quotes",
+      "quotes/{quoteId}/pdf",
     ],
   },
 }
