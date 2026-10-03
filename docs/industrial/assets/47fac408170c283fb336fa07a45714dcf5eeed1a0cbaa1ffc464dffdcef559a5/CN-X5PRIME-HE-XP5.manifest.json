@@ -1,0 +1,250 @@
+{
+  "schema_version": "model_manifest/2.0",
+  "id": "ast_cn_x5prime_he_xp5_glb_v1",
+  "asset_id": "ast_cn_x5prime_he_xp5_glb_v1",
+  "sku_or_syn_id": "CN-X5PRIME-HE-XP5",
+  "sku": "CN-X5PRIME-HE-XP5",
+  "variant_id": "variant_01M41R18MQK0GXGPTYSX0EDZBH",
+  "snapshot_id": "snp_cn_x5prime_he_xp5_v1",
+  "units": "meter",
+  "linear_unit": "m",
+  "coordinate_system": "right_handed_y_up_z_forward",
+  "fidelity": "dimensional_proxy_verified",
+  "format": "model/gltf-binary",
+  "gltf_version": "2.0",
+  "extensions_required": [],
+  "dimensions_mm": {
+    "width": 120.0,
+    "height": 91.0,
+    "depth": 60.0
+  },
+  "bbox": {
+    "min": [
+      -0.06,
+      0.0,
+      -0.045
+    ],
+    "max": [
+      0.06,
+      0.091,
+      0.015
+    ],
+    "size": [
+      0.12,
+      0.091,
+      0.06
+    ]
+  },
+  "body_bbox_m": {
+    "min": [
+      -0.06,
+      0.0,
+      -0.045
+    ],
+    "max": [
+      0.06,
+      0.091,
+      0.015
+    ]
+  },
+  "geometry_bbox_m": {
+    "min": [
+      -0.06,
+      0.0,
+      -0.045
+    ],
+    "max": [
+      0.06,
+      0.091,
+      0.015
+    ]
+  },
+  "anchors": [
+    {
+      "name": "anchor_power_in",
+      "type": "power_input",
+      "position": [
+        -0.04,
+        0.003,
+        -0.03
+      ],
+      "orientation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "port_id": "p_power_in",
+      "description": "Primary 10-30 VDC power input terminal block",
+      "accuracy": "dimensional_proxy_exact"
+    },
+    {
+      "name": "anchor_rs485_mj1",
+      "type": "serial_comm",
+      "position": [
+        -0.015,
+        0.003,
+        -0.03
+      ],
+      "orientation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "port_id": "p_rs485_mj1",
+      "description": "RS-485 Modbus RTU serial port MJ1/MJ2 (RJ45)",
+      "accuracy": "dimensional_proxy_exact"
+    },
+    {
+      "name": "anchor_ethernet_lan",
+      "type": "ethernet",
+      "position": [
+        0.015,
+        0.003,
+        -0.03
+      ],
+      "orientation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "port_id": "p_ethernet_lan",
+      "description": "10/100 Mbps RJ45 Ethernet LAN port",
+      "accuracy": "dimensional_proxy_exact"
+    },
+    {
+      "name": "anchor_analog_in",
+      "type": "analog_input",
+      "position": [
+        0.0,
+        0.088,
+        -0.03
+      ],
+      "orientation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "port_id": "p_analog_in",
+      "description": "4-channel analog inputs 4-20mA / 0-10V",
+      "accuracy": "dimensional_proxy_exact"
+    },
+    {
+      "name": "anchor_digital_in",
+      "type": "discrete_input",
+      "position": [
+        -0.035,
+        0.088,
+        -0.03
+      ],
+      "orientation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "port_id": "p_digital_in",
+      "description": "4-channel 12-24 VDC discrete digital inputs",
+      "accuracy": "dimensional_proxy_exact"
+    },
+    {
+      "name": "anchor_digital_out",
+      "type": "discrete_output",
+      "position": [
+        0.035,
+        0.088,
+        -0.03
+      ],
+      "orientation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "port_id": "p_digital_out",
+      "description": "4-channel 0.5A sourcing transistor outputs",
+      "accuracy": "dimensional_proxy_exact"
+    },
+    {
+      "name": "anchor_display_center",
+      "type": "display_center",
+      "position": [
+        0.0,
+        0.0455,
+        0.015
+      ],
+      "orientation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "port_id": "p_display",
+      "description": "4.3 inch resistive color touchscreen HMI center face",
+      "accuracy": "dimensional_proxy_exact"
+    },
+    {
+      "name": "anchor_mounting_panel",
+      "type": "mounting_panel",
+      "position": [
+        0.0,
+        0.0455,
+        0.0
+      ],
+      "orientation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "port_id": "p_mounting_panel",
+      "description": "Panel cutout mounting plane reference (Z=0)",
+      "accuracy": "dimensional_proxy_exact"
+    },
+    {
+      "name": "anchor_mounting_din",
+      "type": "mounting_din",
+      "position": [
+        0.0,
+        0.0455,
+        -0.045
+      ],
+      "orientation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "port_id": "p_mounting_din",
+      "description": "DIN EN 50022 TS 35 rear rail mounting center",
+      "accuracy": "dimensional_proxy_exact"
+    }
+  ],
+  "qa": {
+    "validator_errors": 0,
+    "dimensional_error_mm": {
+      "x": 0.0,
+      "y": 0.0,
+      "z": 0.0
+    },
+    "max_anchor_error_mm": 0.0,
+    "triangle_count": 336,
+    "vertex_count": 672
+  },
+  "delivery": {
+    "mime_type": "model/gltf-binary",
+    "byte_length": 27340,
+    "sha256": "47fac408170c283fb336fa07a45714dcf5eeed1a0cbaa1ffc464dffdcef559a5"
+  },
+  "sha256": "47fac408170c283fb336fa07a45714dcf5eeed1a0cbaa1ffc464dffdcef559a5",
+  "byte_length": 27340,
+  "provenance": {
+    "kind": "dimensional_proxy_verified",
+    "generator": "scripts/generate-g6-assets.py",
+    "governing_doc": "docs/industrial/MEGAPLAN_MUSE_API_3D_V2.md (\u00a715, \u00a716, \u00a733 G6)"
+  },
+  "created_at": "2026-10-03T21:56:19Z"
+}

@@ -146,3 +146,14 @@ Upon completing the verification in Meta Muse, record the observed outcomes and 
 ```
 
 Notify the team or subagent coordinating Gate G2 with the updated status. If Meta Muse is unable to import the external binary GLB or substitutes procedural primitives, report `muse_import_status: "unsupported_external_import"` to trigger the approved fallback pathway (documentary 2D representation / illustrative labeling without claiming dimensional accuracy, as governed by MEGAPLAN §16.5).
+
+---
+
+## 6. Gate G6 Real Pilot Assets Extension
+
+Following Gate G2 synthetic asset verification, Gate G6 has produced authoritative 3D GLB assets for the **3 real pilot SKUs** (`CN-X5PRIME-HE-XP5`, `CN-N1200`, and `CN-THT02`).
+
+For complete instructions, direct download URLs, and verification rubrics for the real pilot assets, consult:
+- **`docs/industrial/g6-operator-muse-checklist.md`**: Human Operator Meta Muse Integration Checklist for Real Pilot Assets.
+- **`docs/industrial/g6-asset-qa-report.md`**: Comprehensive Gate G6 3D Asset Engineering QA Audit Report.
+

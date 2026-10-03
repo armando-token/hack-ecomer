@@ -1,8 +1,8 @@
 # Project Implementation State Ledger
 
-**Current Gate:** `G5`  
-**Status:** `GATE_G5_COMPLETED`  
-**Last Updated:** `2026-10-03T21:48:00Z`  
+**Current Gate:** `G6`  
+**Status:** `GATE_G6_COMPLETED`  
+**Last Updated:** `2026-10-03T21:58:00Z`  
 **Governing Document:** `docs/industrial/MEGAPLAN_MUSE_API_3D_V2.md`  
 
 ---
@@ -17,7 +17,7 @@
 | **G3** | **Schemas, Data Module & Migrations** | ✅ **COMPLETED** | `industrialConfig` module registered, 13 PostgreSQL tables and 21 indexes migrated, Zod contracts, canonical hash engine, CAS revision conflict guard, tenant isolation, idempotency replay, reversible SYN fixtures, 89/89 tests passing. |
 | **G4** | **Usable Catalog & Real Evidence** | ✅ **COMPLETED** | Verified snapshots for Horner X5, NOVUS N1200, and TZone THT-02; all critical attributes anchored to manufacturer datasheets with page >= 1; exact envelopes in meters; missing circuit roles declared without fake SKUs; 108/108 tests passing. Next: G5. |
 | **G5** | **Strict Rule Evaluator Engine** | ✅ **COMPLETED** | 100% deterministic pure evaluator core, closed tri-state verdicts (`meets`, `does_not_meet`, `not_documented`), elimination of 12 false positives, strict unit conversion table, bipartite channel matching, 14 pilot rules, v1 evaluate route adapter, 272/272 tests passing. Next: G6. |
-| G6 | Product 3D Assets & Dimensional QA | ⏳ Pending | glTF 2.0 / GLB normalization (meters, +Y up, +Z front) and validator checks. |
+| **G6** | **Product 3D Assets & Dimensional QA** | ✅ **COMPLETED** | glTF 2.0 binary (.glb) assets generated in exact meters (+Y up, +Z front) for all 3 pilot SKUs, Khronos glTF-Validator 0 errors/0 warnings, 0.0 mm envelope delta, PortSchema anchor alignment, CAS delivery active, PostgreSQL seeded reversibly, 100% QA tests passing. Next: G7. |
 | G7 | Industrial API v2 & Routing | ⏳ Pending | Clean `/api/industrial/v2` and `/api/muse/v2` endpoints, OpenAPI v2 specification. |
 | G8 | Engineering Bundle & Muse Payload | ⏳ Pending | Scene hints, instance placements, and immutable configuration revisions. |
 | G9 | Multi-Item Quotes & Correlated PDF | ⏳ Pending | Medusa 2 USD pricing, exact integer cents, ReportLab worker with explicit `job_id`. |
@@ -113,8 +113,36 @@
   - `b2b-backend/apps/backend/src/modules/industrial-config/__tests__/evaluator-failure-modes.spec.ts`
   - `b2b-backend/apps/backend/src/modules/industrial-config/__tests__/strict-evaluator-t01-t24.spec.ts`
 
----
+### Gate G6: Product 3D Assets & Dimensional QA
+- **Date Completed:** 2026-10-03
+- **Accomplishments:**
+  - Pure Python 3 generator `scripts/generate-g6-assets.py` implemented for all 3 Gate G4 pilot SKUs (`CN-X5PRIME-HE-XP5`, `CN-N1200`, `CN-THT02`).
+  - Constructed mathematically precise glTF 2.0 binary (`.glb`) assets in exact METERS (`linear_unit: "m"`), normalized to right-handed coordinate system (+Y up, +Z forward) with zero required extensions (no Draco, no Meshopt, no KTX2).
+  - Verified honest fidelity tier `dimensional_proxy_verified` derived from official manufacturer engineering drawings (Horner MAN1363-R21, NOVUS UG-V2.0xQ, TZone UM-V1.1).
+  - Validated 0.0 mm dimensional delta between nominal datasheet bounding boxes and computed GLB envelopes across all axes.
+  - Established 1:1 PortSchema topological anchor bindings in glTF node hierarchy for all power, sensor, control, and communication ports.
+  - Automated Khronos `gltf-validator` checks via `scripts/validate-g6-assets.js`: 0 errors, 0 warnings, 0 infos, 0 hints across all 3 models.
+  - Generated 512×512 PNG dark-mode isometric preview thumbnails in `docs/industrial/assets/thumbnails/` and `storage/industrial/assets/thumbnails/`.
+  - Seeded `industrial_asset` and `industrial_asset_binding` records into PostgreSQL 16.15 with reversible migration scripts (`seed-g6-assets.ts` and `revert-g6-assets.ts`) without mutating core commerce tables.
+  - Developed Jest acceptance QA test suite `src/modules/industrial-config/__tests__/g6-assets-qa.spec.ts` (23/23 tests passing) covering CAS integrity, SHA-256 digests, bounding boxes, PortSchema anchors, PostgreSQL records, and HTTP delivery routes.
+  - Created human operator Meta Muse verification checklist `docs/industrial/g6-operator-muse-checklist.md` tracking external spatial import under BLK-06.
+- **Artifacts Produced:**
+  - `docs/gates/G6.md`
+  - `docs/industrial/g6-asset-qa-report.md`
+  - `docs/industrial/g6-operator-muse-checklist.md`
+  - `docs/industrial/assets/CN-X5PRIME-HE-XP5.qa.md`
+  - `docs/industrial/assets/CN-N1200.qa.md`
+  - `docs/industrial/assets/CN-THT02.qa.md`
+  - `docs/industrial/assets/*.manifest.json`
+  - `docs/industrial/assets/*.glb`
+  - `docs/industrial/assets/thumbnails/*.png`
+  - `scripts/generate-g6-assets.py`
+  - `scripts/validate-g6-assets.js`
+  - `b2b-backend/apps/backend/src/scripts/seed-g6-assets.ts`
+  - `b2b-backend/apps/backend/src/scripts/revert-g6-assets.ts`
+  - `b2b-backend/apps/backend/src/modules/industrial-config/__tests__/g6-assets-qa.spec.ts`
 
+---
 
 ## 3. Open Failures and Operational Blockers
 
@@ -125,7 +153,7 @@
 | ~**BLK-03**~ | ~Yarn package manager not installed on EC2 host~ | **CLEARED in G1** | G1 | Enabled Yarn 4.12.0 via Corepack. |
 | ~**BLK-04**~ | ~Python `reportlab` library not installed~ | **CLEARED in G1** | G1 | Installed `reportlab==5.0.1` and `pillow==11.3.0` in `.venv`. |
 | ~**BLK-05**~ | ~ZooWork account credentials missing~ | **CLEARED in G0** | N/A | ZooWork path abandoned. Human has Muse available; Gate G2 will test GLB delivery. |
-| **BLK-06** | Meta Muse external account execution requires human operator credentials | External verification of GLB import in Meta Muse pending | G2 | Human operator follows `docs/industrial/g2-operator-muse-checklist.md`. Does not block Gate G3 development. |
+| **BLK-06** | Meta Muse external account execution requires human operator credentials | External verification of GLB import in Meta Muse pending for G2 synthetic & G6 real pilot assets | G2 / G6 | Human operator follows `docs/industrial/g2-operator-muse-checklist.md` and `docs/industrial/g6-operator-muse-checklist.md`. Does not block Gate G7 development. |
 
 ---
 

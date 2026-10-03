@@ -5,7 +5,7 @@ export const IndustrialAsset = model.define("industrial_asset", {
   variant_id: model.text().nullable(),
   snapshot_id: model.text().nullable(),
   kind: model.text(), // e.g. "3d_model", "datasheet", "diagram"
-  revision: model.number().default(1),
+  revision: model.text().default("1"),
   sha256: model.text(),
   bytes: model.number(),
   mime: model.text(),

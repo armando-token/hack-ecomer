@@ -1,0 +1,160 @@
+{
+  "schema_version": "model_manifest/2.0",
+  "id": "ast_cn_tht02_glb_v1",
+  "asset_id": "ast_cn_tht02_glb_v1",
+  "sku_or_syn_id": "CN-THT02",
+  "sku": "CN-THT02",
+  "variant_id": "variant_01M41R193J5MPJ16MTX9CAWWRM",
+  "snapshot_id": "snp_cn_tht02_v1",
+  "units": "meter",
+  "linear_unit": "m",
+  "coordinate_system": "right_handed_y_up_z_forward",
+  "fidelity": "dimensional_proxy_verified",
+  "format": "model/gltf-binary",
+  "gltf_version": "2.0",
+  "extensions_required": [],
+  "dimensions_mm": {
+    "width": 110.0,
+    "height": 85.0,
+    "depth": 40.0
+  },
+  "bbox": {
+    "min": [
+      -0.055,
+      0.0,
+      -0.02
+    ],
+    "max": [
+      0.055,
+      0.085,
+      0.02
+    ],
+    "size": [
+      0.11,
+      0.085,
+      0.04
+    ]
+  },
+  "body_bbox_m": {
+    "min": [
+      -0.055,
+      0.0,
+      -0.02
+    ],
+    "max": [
+      0.055,
+      0.085,
+      0.02
+    ]
+  },
+  "geometry_bbox_m": {
+    "min": [
+      -0.055,
+      0.0,
+      -0.02
+    ],
+    "max": [
+      0.055,
+      0.085,
+      0.02
+    ]
+  },
+  "anchors": [
+    {
+      "name": "anchor_sensor_internal",
+      "type": "sensor_internal",
+      "position": [
+        0.0,
+        0.078,
+        0.0
+      ],
+      "orientation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "port_id": "p_sensor_internal",
+      "description": "Internal Sensirion SHT30 temperature & humidity element inside protective cap",
+      "accuracy": "dimensional_proxy_exact"
+    },
+    {
+      "name": "anchor_power_in",
+      "type": "power_input",
+      "position": [
+        -0.003,
+        0.0,
+        0.0
+      ],
+      "orientation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "port_id": "p_power_in",
+      "description": "5-24 VDC power supply lead entry at cable gland",
+      "accuracy": "dimensional_proxy_exact"
+    },
+    {
+      "name": "anchor_rs485",
+      "type": "serial_comm",
+      "position": [
+        0.003,
+        0.0,
+        0.0
+      ],
+      "orientation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "port_id": "p_rs485",
+      "description": "RS-485 Modbus RTU 2-wire serial lead entry at cable gland",
+      "accuracy": "dimensional_proxy_exact"
+    },
+    {
+      "name": "anchor_mounting_wall",
+      "type": "mounting_wall",
+      "position": [
+        0.0,
+        0.0425,
+        -0.02
+      ],
+      "orientation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "port_id": "p_mounting_wall",
+      "description": "Wall / enclosure mounting back plane reference (Z=-0.020)",
+      "accuracy": "dimensional_proxy_exact"
+    }
+  ],
+  "qa": {
+    "validator_errors": 0,
+    "dimensional_error_mm": {
+      "x": 0.0,
+      "y": 0.0,
+      "z": 0.0
+    },
+    "max_anchor_error_mm": 0.0,
+    "triangle_count": 156,
+    "vertex_count": 312
+  },
+  "delivery": {
+    "mime_type": "model/gltf-binary",
+    "byte_length": 15420,
+    "sha256": "7e5d88e48e051933807cb70fc184aa5c167c59ded25a5cf27f17b5046293d327"
+  },
+  "sha256": "7e5d88e48e051933807cb70fc184aa5c167c59ded25a5cf27f17b5046293d327",
+  "byte_length": 15420,
+  "provenance": {
+    "kind": "dimensional_proxy_verified",
+    "generator": "scripts/generate-g6-assets.py",
+    "governing_doc": "docs/industrial/MEGAPLAN_MUSE_API_3D_V2.md (\u00a715, \u00a716, \u00a733 G6)"
+  },
+  "created_at": "2026-10-03T21:56:19Z"
+}

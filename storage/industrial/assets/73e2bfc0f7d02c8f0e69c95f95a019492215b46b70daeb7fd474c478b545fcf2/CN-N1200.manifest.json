@@ -1,0 +1,250 @@
+{
+  "schema_version": "model_manifest/2.0",
+  "id": "ast_cn_n1200_glb_v1",
+  "asset_id": "ast_cn_n1200_glb_v1",
+  "sku_or_syn_id": "CN-N1200",
+  "sku": "CN-N1200",
+  "variant_id": "variant_01M41R18XQ6QNWMX8Z39NMR2NW",
+  "snapshot_id": "snp_cn_n1200_v1",
+  "units": "meter",
+  "linear_unit": "m",
+  "coordinate_system": "right_handed_y_up_z_forward",
+  "fidelity": "dimensional_proxy_verified",
+  "format": "model/gltf-binary",
+  "gltf_version": "2.0",
+  "extensions_required": [],
+  "dimensions_mm": {
+    "width": 48.0,
+    "height": 48.0,
+    "depth": 110.0
+  },
+  "bbox": {
+    "min": [
+      -0.024,
+      0.0,
+      -0.1
+    ],
+    "max": [
+      0.024,
+      0.048,
+      0.01
+    ],
+    "size": [
+      0.048,
+      0.048,
+      0.11
+    ]
+  },
+  "body_bbox_m": {
+    "min": [
+      -0.024,
+      0.0,
+      -0.1
+    ],
+    "max": [
+      0.024,
+      0.048,
+      0.01
+    ]
+  },
+  "geometry_bbox_m": {
+    "min": [
+      -0.024,
+      0.0,
+      -0.1
+    ],
+    "max": [
+      0.024,
+      0.048,
+      0.01
+    ]
+  },
+  "anchors": [
+    {
+      "name": "anchor_power_in",
+      "type": "power_input",
+      "position": [
+        -0.013,
+        0.04,
+        -0.1
+      ],
+      "orientation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "port_id": "p_power_in",
+      "description": "100-240 VAC/DC power input terminals 1 & 2",
+      "accuracy": "dimensional_proxy_exact"
+    },
+    {
+      "name": "anchor_universal_in",
+      "type": "sensor_input",
+      "position": [
+        0.013,
+        0.028,
+        -0.1
+      ],
+      "orientation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "port_id": "p_universal_in",
+      "description": "Universal sensor input terminals 11, 12, 13 (Pt100/TC/mA/V)",
+      "accuracy": "dimensional_proxy_exact"
+    },
+    {
+      "name": "anchor_out1_ctrl",
+      "type": "control_output",
+      "position": [
+        -0.013,
+        0.024,
+        -0.1
+      ],
+      "orientation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "port_id": "p_out1_ctrl",
+      "description": "OUT1 control pulse / SSR drive terminals 4 & 5",
+      "accuracy": "dimensional_proxy_exact"
+    },
+    {
+      "name": "anchor_out2_alarm",
+      "type": "alarm_output",
+      "position": [
+        -0.013,
+        0.014,
+        -0.1
+      ],
+      "orientation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "port_id": "p_out2_alarm",
+      "description": "OUT2 relay alarm contact terminals 6 & 7",
+      "accuracy": "dimensional_proxy_exact"
+    },
+    {
+      "name": "anchor_out3_alarm",
+      "type": "alarm_output",
+      "position": [
+        -0.013,
+        0.006,
+        -0.1
+      ],
+      "orientation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "port_id": "p_out3_alarm",
+      "description": "OUT3 relay alarm SPDT contact terminals 8, 9, 10",
+      "accuracy": "dimensional_proxy_exact"
+    },
+    {
+      "name": "anchor_out4_analog",
+      "type": "analog_output",
+      "position": [
+        0.013,
+        0.014,
+        -0.1
+      ],
+      "orientation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "port_id": "p_out4_analog",
+      "description": "OUT4 4-20mA analog retransmission terminals 9 & 10",
+      "accuracy": "dimensional_proxy_exact"
+    },
+    {
+      "name": "anchor_usb_comm",
+      "type": "serial_comm",
+      "position": [
+        0.015,
+        0.007,
+        0.01
+      ],
+      "orientation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "port_id": "p_usb_comm",
+      "description": "Front panel Mini-B USB configuration interface",
+      "accuracy": "dimensional_proxy_exact"
+    },
+    {
+      "name": "anchor_display_center",
+      "type": "display_center",
+      "position": [
+        0.0,
+        0.028,
+        0.01
+      ],
+      "orientation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "port_id": "p_display",
+      "description": "Dual 4-digit LED display & keypad face center",
+      "accuracy": "dimensional_proxy_exact"
+    },
+    {
+      "name": "anchor_mounting_panel",
+      "type": "mounting_panel",
+      "position": [
+        0.0,
+        0.024,
+        0.0
+      ],
+      "orientation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "port_id": "p_mounting_panel",
+      "description": "1/16 DIN panel mount insertion plane reference (Z=0)",
+      "accuracy": "dimensional_proxy_exact"
+    }
+  ],
+  "qa": {
+    "validator_errors": 0,
+    "dimensional_error_mm": {
+      "x": 0.0,
+      "y": 0.0,
+      "z": 0.0
+    },
+    "max_anchor_error_mm": 0.0,
+    "triangle_count": 408,
+    "vertex_count": 816
+  },
+  "delivery": {
+    "mime_type": "model/gltf-binary",
+    "byte_length": 31408,
+    "sha256": "73e2bfc0f7d02c8f0e69c95f95a019492215b46b70daeb7fd474c478b545fcf2"
+  },
+  "sha256": "73e2bfc0f7d02c8f0e69c95f95a019492215b46b70daeb7fd474c478b545fcf2",
+  "byte_length": 31408,
+  "provenance": {
+    "kind": "dimensional_proxy_verified",
+    "generator": "scripts/generate-g6-assets.py",
+    "governing_doc": "docs/industrial/MEGAPLAN_MUSE_API_3D_V2.md (\u00a715, \u00a716, \u00a733 G6)"
+  },
+  "created_at": "2026-10-03T21:56:19Z"
+}
