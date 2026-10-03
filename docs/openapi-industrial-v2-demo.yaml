@@ -132,7 +132,7 @@ components:
               type: array
               items:
                 type: string
-              example: ["capabilities", "products/search", "products/{idOrSku}", "products/{idOrSku}/model3d", "evaluate", "configurations/heating-chamber/bundle"]
+              example: ["capabilities", "products/search", "products/{idOrSku}", "products/{idOrSku}/model3d", "products/{idOrSku}/offer", "preliminary-quotes", "quotes/{quoteId}/pdf", "evaluate", "configurations/heating-chamber/bundle"]
 
     ProductSearchItem:
       type: object
@@ -571,6 +571,7 @@ components:
         - identity
         - engineering
         - technical_evaluation
+        - commercial
         - assets
         - process_context
         - delivery
@@ -626,16 +627,380 @@ components:
               properties:
                 technical_readiness:
                   type: boolean
+                  example: true
                 presentation_readiness:
                   type: boolean
+                  example: true
                 commercial_readiness:
                   type: boolean
+                  example: true
+                ready_for_commercial_estimate:
+                  type: boolean
+                  example: true
+        commercial:
+          type: object
+          required:
+            - currency
+            - items
+            - catalog_total_usd_cents
+            - catalog_total_usd
+            - missing_roles_unpriced
+            - quote_readiness
+          properties:
+            currency:
+              type: string
+              example: "USD"
+            items:
+              type: array
+              items:
+                type: object
+                required:
+                  - sku
+                  - title
+                  - quantity
+                  - unit_price_usd_cents
+                  - unit_price_usd
+                  - subtotal_usd_cents
+                  - subtotal_usd
+                  - availability
+                properties:
+                  sku:
+                    type: string
+                    example: "CN-X5PRIME-HE-XP5"
+                  title:
+                    type: string
+                    example: "X5 Prime OCS All-in-One Controller (HE-XP5)"
+                  quantity:
+                    type: integer
+                    example: 1
+                  unit_price_usd_cents:
+                    type: integer
+                    example: 89000
+                  unit_price_usd:
+                    type: number
+                    example: 890.00
+                  subtotal_usd_cents:
+                    type: integer
+                    example: 89000
+                  subtotal_usd:
+                    type: number
+                    example: 890.00
+                  availability:
+                    type: string
+                    example: "in_stock"
+            catalog_total_usd_cents:
+              type: integer
+              description: Total catalog price of priced items in USD cents ($1,445.00 = 144500 cents).
+              example: 144500
+            catalog_total_usd:
+              type: number
+              description: Total catalog price of priced items in USD ($1,445.00).
+              example: 1445.00
+            missing_roles_unpriced:
+              type: array
+              description: Roles in the configuration that remain unpriced without fabricated SKUs.
+              items:
+                type: string
+              example:
+                - "power_actuator_ssr"
+                - "electric_heater_element"
+            quote_readiness:
+              type: string
+              example: "ready_for_preliminary_estimate"
+        readiness:
+          type: object
+          properties:
+            ready_for_3d_presentation:
+              type: boolean
+              example: true
+            ready_for_commercial_estimate:
+              type: boolean
+              example: true
+            ready_for_procurement:
+              type: boolean
+              example: false
+            blockers:
+              type: array
+              items:
+                type: string
         assets:
           type: object
         process_context:
           type: object
         delivery:
           type: object
+
+    LiveProductOffer:
+      type: object
+      required:
+        - sku
+        - title
+        - quantity
+        - state
+        - currency
+        - unit_price_minor
+        - unit_price
+        - subtotal_minor
+        - subtotal
+        - scale
+        - availability
+        - availability_status
+        - tax_status
+        - shipping_status
+        - observed_at
+      properties:
+        sku:
+          type: string
+          example: "CN-X5PRIME-HE-XP5"
+        variant_id:
+          type: string
+          example: "variant_01JUS00HACKDAY26XP500000"
+        title:
+          type: string
+          example: "X5 Prime OCS All-in-One Controller (HE-XP5)"
+        model:
+          type: string
+          nullable: true
+          example: "HE-XP5"
+        quantity:
+          type: integer
+          example: 1
+        state:
+          type: string
+          enum: [priced, manual_review]
+          example: "priced"
+        review_reason:
+          type: string
+          nullable: true
+          example: null
+        currency:
+          type: string
+          example: "usd"
+        unit_price_minor:
+          type: integer
+          description: Price in integer minor currency units (USD cents). For $890.00, minor is 89000.
+          example: 89000
+        unit_price:
+          type: number
+          description: Price in standard decimal units ($890.00).
+          example: 890.00
+        subtotal_minor:
+          type: integer
+          description: Subtotal in integer minor currency units (cents).
+          example: 89000
+        subtotal:
+          type: number
+          description: Subtotal in standard decimal units ($890.00).
+          example: 890.00
+        scale:
+          type: integer
+          example: 2
+        availability:
+          type: object
+          required:
+            - status
+            - available_quantity
+            - stocked_quantity
+            - reserved_quantity
+            - manage_inventory
+            - allow_backorder
+          properties:
+            status:
+              type: string
+              enum: [in_stock, limited_stock, out_of_stock, backorder]
+              example: "in_stock"
+            available_quantity:
+              type: integer
+              example: 10
+            stocked_quantity:
+              type: integer
+              example: 10
+            reserved_quantity:
+              type: integer
+              example: 0
+            manage_inventory:
+              type: boolean
+              example: true
+            allow_backorder:
+              type: boolean
+              example: false
+        availability_status:
+          type: string
+          enum: [in_stock, limited_stock, out_of_stock, backorder]
+          example: "in_stock"
+        tax_status:
+          type: string
+          example: "tax_excluded"
+        shipping_status:
+          type: string
+          example: "to_be_confirmed"
+        limitations:
+          type: array
+          items:
+            type: string
+          example: ["demo_catalog_only", "pilot_scope_rev_2026.1"]
+        observed_at:
+          type: string
+          format: date-time
+          example: "2026-10-03T22:50:00Z"
+        product_url:
+          type: string
+          example: "https://data.controlnautas.com/us/products/cn-x5prime-he-xp5"
+
+    CreatePreliminaryQuoteRequest:
+      type: object
+      required:
+        - items
+      properties:
+        items:
+          type: array
+          description: List of pilot SKUs or variant IDs to include in the preliminary quotation.
+          items:
+            type: object
+            required:
+              - sku
+              - quantity
+            properties:
+              sku:
+                type: string
+                description: Canonical SKU (e.g. `CN-X5PRIME-HE-XP5`, `CN-N1200`, `CN-THT02`).
+                example: "CN-X5PRIME-HE-XP5"
+              quantity:
+                type: integer
+                minimum: 1
+                maximum: 20
+                default: 1
+                example: 1
+        customer:
+          type: object
+          properties:
+            company:
+              type: string
+              example: "Industrial Pilot Lab"
+            email:
+              type: string
+              format: email
+              example: "operator@controlnautas.com"
+            reference:
+              type: string
+              example: "REF-HEATING-CHAMBER-001"
+        region_id:
+          type: string
+          description: Optional Medusa market region ID.
+          example: "reg_01JUS00HACKDAY26DEMOUSD0000"
+        currency:
+          type: string
+          default: "usd"
+          example: "usd"
+        idempotency_key:
+          type: string
+          description: Optional unique client idempotency token.
+          example: "idem_quote_hc_001"
+
+    PreliminaryQuoteResponse:
+      type: object
+      required:
+        - quote_id
+        - status
+        - currency
+        - items
+        - total_cents
+        - total_usd
+        - pdf_download_url
+        - observed_at
+        - expires_at
+      properties:
+        quote_id:
+          type: string
+          example: "qte_01JUS00HACKDAY26QUOTE001"
+        opaque_public_id:
+          type: string
+          example: "pub_01JUS00HACKDAY26001"
+        status:
+          type: string
+          enum: [preliminary, priced, manual_review]
+          example: "preliminary"
+        currency:
+          type: string
+          example: "USD"
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuoteItemResponse'
+        total_cents:
+          type: integer
+          description: Total quote amount in exact integer USD cents ($1,445.00 -> 144500 cents).
+          example: 144500
+        total_usd:
+          type: number
+          description: Total quote amount in decimal USD ($1,445.00).
+          example: 1445.00
+        pdf_download_url:
+          type: string
+          description: Streamed download URL for official ReportLab PDF quotation.
+          example: "https://data.controlnautas.com/api/industrial/v2/quotes/qte_01JUS00HACKDAY26QUOTE001/pdf?token=sec_tok_01abc"
+        observed_at:
+          type: string
+          format: date-time
+          example: "2026-10-03T22:50:00Z"
+        expires_at:
+          type: string
+          format: date-time
+          example: "2026-11-02T22:50:00Z"
+
+    QuoteItemResponse:
+      type: object
+      required:
+        - sku
+        - title
+        - quantity
+        - currency
+        - unit_price_cents
+        - unit_price_usd
+        - subtotal_cents
+        - subtotal_usd
+        - availability
+      properties:
+        sku:
+          type: string
+          example: "CN-X5PRIME-HE-XP5"
+        variant_id:
+          type: string
+          example: "variant_01JUS00HACKDAY26XP500000"
+        title:
+          type: string
+          example: "X5 Prime OCS All-in-One Controller (HE-XP5)"
+        model:
+          type: string
+          example: "HE-XP5"
+        quantity:
+          type: integer
+          example: 1
+        currency:
+          type: string
+          example: "USD"
+        unit_price_cents:
+          type: integer
+          description: Unit price in exact USD cents (e.g. 89000 cents for $890.00).
+          example: 89000
+        unit_price_usd:
+          type: number
+          example: 890.00
+        subtotal_cents:
+          type: integer
+          description: Line subtotal in exact USD cents.
+          example: 89000
+        subtotal_usd:
+          type: number
+          example: 890.00
+        availability:
+          type: string
+          enum: [in_stock, limited_stock, out_of_stock, backorder]
+          example: "in_stock"
+        observed_at:
+          type: string
+          format: date-time
+          example: "2026-10-03T22:50:00Z"
 
     ErrorResponse:
       type: object
@@ -935,6 +1300,175 @@ paths:
                 $ref: '#/components/schemas/ConfigurationBundle'
         '401':
           description: Unauthorized - Invalid Bearer token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/industrial/v2/products/{idOrSku}/offer:
+    get:
+      tags:
+        - Products
+        - Commerce
+      summary: Retrieve real-time verified commercial offer and inventory availability
+      description: |
+        Returns live pricing resolved from Medusa commerce engine for the specified product SKU
+        or variant ID. Pricing is delivered in canonical integer minor units (USD cents) and decimal USD.
+        Reflects real stocked inventory and availability state without hallucinated discounts or unverified prices.
+      operationId: getProductLiveOffer
+      security:
+        - BearerAuth: []
+        - {}
+      parameters:
+        - name: idOrSku
+          in: path
+          required: true
+          description: Canonical SKU or variant ID (e.g. `CN-N1200`, `CN-X5PRIME-HE-XP5`, `CN-THT02`).
+          schema:
+            type: string
+        - name: quantity
+          in: query
+          required: false
+          description: Desired order quantity (integer between 1 and 20, default 1).
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 20
+            default: 1
+        - name: region_id
+          in: query
+          required: false
+          description: Optional Medusa market region ID (defaults to US / USD demonstration catalog).
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Live commercial offer calculation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LiveProductOffer'
+        '400':
+          description: Invalid quantity or request parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Product SKU or variant not found in active catalog
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized - Invalid Bearer token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/industrial/v2/preliminary-quotes:
+    post:
+      tags:
+        - Commerce
+        - Quotes
+      summary: Create an official multiline preliminary quotation for pilot components
+      description: |
+        Generates an immutable preliminary B2B quotation for specified pilot equipment.
+        Calculates line subtotals and catalog totals using exact integer cents in USD.
+        Creates a correlated ReportLab PDF quotation job and returns the quote ID and signed PDF download URL.
+        Client-provided pricing, discounts, and fake SKUs are strictly stripped and rejected.
+      operationId: createPreliminaryQuote
+      security:
+        - BearerAuth: []
+        - {}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePreliminaryQuoteRequest'
+      responses:
+        '201':
+          description: Preliminary quotation created successfully with signed PDF URL
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PreliminaryQuoteResponse'
+        '400':
+          description: Malformed request body, invalid quantity, or missing items
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: One or more requested SKUs not found in active catalog
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Idempotency conflict - key reused with conflicting request payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized - Invalid Bearer token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/industrial/v2/quotes/{quoteId}/pdf:
+    get:
+      tags:
+        - Commerce
+        - Quotes
+      summary: Download signed engineering PDF quotation compiled by native worker
+      description: |
+        Streams the verified binary `%PDF-1.4` document compiled by the native Python ReportLab worker.
+        The document contains official letterhead, itemized BOM pricing breakdown in USD,
+        system engineering readiness disclaimers, and correlated job ID.
+      operationId: downloadQuotePdf
+      security:
+        - BearerAuth: []
+        - {}
+      parameters:
+        - name: quoteId
+          in: path
+          required: true
+          description: Unique quote identifier or opaque public ID (e.g. `qte_01...` or `pub_...`).
+          schema:
+            type: string
+        - name: token
+          in: query
+          required: false
+          description: Scoped cryptographic download authorization token.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Signed quotation document binary stream
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        '401':
+          description: Unauthorized - Missing or invalid download token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Quote ID not found or PDF compilation pending
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '410':
+          description: Quote download token has expired
           content:
             application/json:
               schema:

@@ -62,6 +62,26 @@ Before initiating verification in Meta Muse, ensure the assets are accessible ei
 - **Signed Short-Lived URL (15-Minute TTL):**  
   Obtained via API: `GET /api/industrial/v2/experimental/assets/ast_cn_tht02_glb_v1/delivery`.
 
+### 2.4 Authoritative OEM PDF References & Public HTTPS Delivery
+All pilot manufacturer datasheets and OEM source manuals are published via public HTTPS on Nginx:
+- **Pilot Catalog Datasheets:**
+  - `https://data.controlnautas.com/demo/datasheets/CN-N1200.pdf` (NOVUS N1200 Universal Process Controller User Manual)
+  - `https://data.controlnautas.com/demo/datasheets/CN-X5PRIME-HE-XP5.pdf` (Horner X5 Prime OCS Datasheet)
+  - `https://data.controlnautas.com/demo/datasheets/CN-THT02.pdf` (TZone THT-02 Sensor Manual)
+- **OEM Source Archive & Reference Manuals:**
+  - `https://data.controlnautas.com/oem-sources/horner-x4/MAN1137_21_EN_X4_UM.pdf` (Horner X4 User Manual)
+  - `https://data.controlnautas.com/oem-sources/horner-x4/MAN1138_R21_X4_DS.pdf` (Horner X4 Datasheet)
+  - `https://data.controlnautas.com/oem-sources/tzone-tht02/THT02_users_manual_v1.1.pdf` (TZone THT-02 User Manual V1.1)
+  - `https://data.controlnautas.com/oem-sources/unitronics-or-misc/U_PumpHouse_Install.pdf` (King Electric U-Series Pumphouse Heater Installation Guide)
+  - `https://data.controlnautas.com/oem-sources/unitronics-or-misc/U_WEB.pdf` (King Electric U-Series Pumphouse Heater Overview)
+
+### 2.5 Explicit Behavioral Rules for Meta Muse Operators (Gate REAL_OEM_SYNC)
+> [!IMPORTANT]
+> **Strict Behavioral Doctrine for Muse Operators:**
+> - Muse MUST load ONLY catalog GLBs for pilot SKUs: `CN-X5PRIME-HE-XP5`, `CN-N1200`, `CN-THT02`.
+> - SSR and heater heating elements MUST remain unlabeled generic missing_roles; never invent unverified equipment.
+> - Muse SHOULD open OEM PDFs over HTTPS (`https://data.controlnautas.com/demo/datasheets/...` and `/oem-sources/...`) to inspect physical appearance, terminal block layouts, and bezel details. Muse MUST NEVER invent alternate controllers/sensors that replace catalog GLBs.
+
 ---
 
 ## 3. Step-by-Step Operator Verification Procedure
@@ -165,6 +185,8 @@ Confirm all 4 nodes:
 | **Anchor Preservation** | All scene anchors detected with exact translations. | 9/9 Anchors | 9/9 Anchors | 4/4 Anchors | [ ] |
 | **PBR Material Fidelity** | Distinct material regions (bezel, screen, LEDs, terminals). | 7 Materials | 8 Materials | 6 Materials | [ ] |
 | **Credential Isolation** | No Bearer tokens exposed in public asset URLs or client query parameters. | Verified | Verified | Verified | [ ] |
+| **OEM PDF Delivery** | All 8 PDF datasheets & OEM manuals return HTTP 200 over HTTPS with CORS `*`. | Verified (8/8) | Verified (8/8) | Verified (8/8) | [ ] |
+| **Catalog Protection** | Ingest ONLY pilot catalog GLBs; never substitute alternate controllers or invent unverified missing equipment. | Verified | Verified | Verified | [ ] |
 
 ---
 

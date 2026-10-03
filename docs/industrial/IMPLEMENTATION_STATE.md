@@ -1,8 +1,8 @@
 # Project Implementation State Ledger
 
-**Current Gate:** `SPRINT_DEMO_P0`  
-**Status:** `SPRINT_DEMO_P0_COMPLETED`  
-**Last Updated:** `2026-10-03T22:15:00Z`  
+**Current Gate:** `G9_COMMERCE_V2`  
+**Status:** `G9_COMMERCE_V2_COMPLETED`  
+**Last Updated:** `2026-10-03T22:54:00Z`  
 **Governing Document:** `docs/industrial/MEGAPLAN_MUSE_API_3D_V2.md`  
 
 ---
@@ -19,9 +19,10 @@
 | **G5** | **Strict Rule Evaluator Engine** | ✅ **COMPLETED** | 100% deterministic pure evaluator core, closed tri-state verdicts (`meets`, `does_not_meet`, `not_documented`), elimination of 12 false positives, strict unit conversion table, bipartite channel matching, 14 pilot rules, v1 evaluate route adapter, 272/272 tests passing. Next: G6. |
 | **G6** | **Product 3D Assets & Dimensional QA** | ✅ **COMPLETED** | glTF 2.0 binary (.glb) assets generated in exact meters (+Y up, +Z front) for all 3 pilot SKUs, Khronos glTF-Validator 0 errors/0 warnings, 0.0 mm envelope delta, PortSchema anchor alignment, CAS delivery active, PostgreSQL seeded reversibly, 100% QA tests passing. Next: DEMO P0. |
 | **DEMO P0** | **Sprint DEMO P0 Consolidated Gate** | ✅ **COMPLETED** | Public Edge TLS on `https://data.controlnautas.com`, API v2 thin surface, Heating Chamber bundle, Medusa 2 USD preliminary quotes & PDF, Next.js `/solution` studio page. Ready for Muse Connector Test. |
+| **REAL_OEM_SYNC** | **OEM Sources Audit, Public HTTPS & Catalog Guard** | ✅ **COMPLETED** | Nginx public HTTPS publishing of OEM sources and datasheets, provenance registry updated (SRC-28 to SRC-32), manifest generated, and Muse operator behavioral doctrine enforced. |
 | G7 | Industrial API v2 & Routing | ⏳ Thin Complete (Full post-demo) | Clean discovery, search, detail, model3d, and strict evaluate endpoints active. |
 | G8 | Engineering Bundle & Muse Payload | ⏳ Thin Complete (Full post-demo) | Heating chamber unified bundle and scene references deployed. |
-| G9 | Multi-Item Quotes & Correlated PDF | ⏳ Lite Complete (Full post-demo) | Preliminary quotes and ReportLab PDF download active over HTTPS. |
+| **G9** | **Multi-Item Quotes & Correlated PDF** | ✅ **COMPLETED** | Live Medusa 2 integration, exact integer minor cents ($1,445.00 total), multiline preliminary quotes, ReportLab PDF streaming, commercial bundle block, and public HTTPS verification. |
 | G10 | Web Storefront & Admin Extensions | ⏳ Min Complete (Full post-demo) | English Solution Studio `/solution` page live in Next.js storefront. |
 | G11 | Optional Thermal Simulation | ⏳ Pending | Pure TypeScript first-order lumped model (§22.2) when requested. |
 | G12 | D1 Milestone Acceptance | ⏳ Pending | Complete integration test of catalog, evaluation, GLB delivery, and quote snapshot. |
@@ -159,6 +160,47 @@
   - `b2b-storefront/src/app/[countryCode]/(main)/solution/page.tsx`
   - `b2b-storefront/src/app/solution/page.tsx`
   - `b2b-storefront/public/images/industrial/*.png`
+
+### Gate REAL_OEM_SYNC: Real OEM Documentation Audit, HTTPS Publishing & Catalog Protection
+- **Date Completed:** 2026-10-03
+- **Accomplishments:**
+  - Audited 5 operator-dropped OEM technical PDF manuals and datasheets in `docs/industrial/oem-sources/` (Horner X4 manual & datasheet, TZone THT-02 manual, UniStream PumpHouse and WEB).
+  - Verified cryptographic SHA-256 hashes, file sizes, and page counts; determined technical distinction between Horner X4 (3.5" non-pilot reference) and Horner X5 Prime OCS (`CN-X5PRIME-HE-XP5` 4.3" pilot SKU), preventing catalog/model corruption.
+  - Published static `/demo/datasheets/` and `/oem-sources/` directories via Nginx on public HTTPS (`data.controlnautas.com`) with TLS 1.3, CORS `*`, `Cache-Control: public, max-age=86400`, and `autoindex off`.
+  - Verified live HTTP 200 responses and `Content-Type: application/pdf` across all 8 public PDF endpoints.
+  - Updated authoritative provenance registry `docs/industrial/sources.json` registering `SRC-28` through `SRC-32` and updating `generated_at`.
+  - Created machine-readable audit manifest `docs/industrial/oem-sources/manifests/oem-sources-manifest.json`.
+  - Encoded strict behavioral doctrine for Meta Muse operators in `docs/industrial/muse-operator-demo-p0.md` and `docs/industrial/g6-operator-muse-checklist.md` enforcing catalog GLB protection, generic missing roles, and visual verification via public HTTPS PDF links without model substitution.
+- **Artifacts Produced:**
+  - `docs/gates/REAL_OEM_SYNC.md`
+  - `docs/industrial/sources.json` (updated)
+  - `docs/industrial/oem-sources/manifests/oem-sources-manifest.json`
+  - `docs/industrial/muse-operator-demo-p0.md` (updated)
+  - `docs/industrial/g6-operator-muse-checklist.md` (updated)
+  - `/etc/nginx/conf.d/controlnautas.conf` (updated)
+
+### Gate G9: Live B2B Commerce, Multiline Preliminary Quotes & Correlated PDF
+- **Date Completed:** 2026-10-03
+- **Accomplishments:**
+  - Integrated real-time pricing and inventory calculation directly with Medusa 2 commerce database without fabricated prices or hardcoded dummy estimates.
+  - Implemented wire-exact integer minor currency unit arithmetic (USD cents) across all offer and preliminary quote operations, avoiding floating point precision errors.
+  - Deployed verified commercial endpoints on public HTTPS (`https://data.controlnautas.com`):
+    - `GET /api/industrial/v2/products/{idOrSku}/offer` for live single-SKU pricing and inventory availability.
+    - `POST /api/industrial/v2/preliminary-quotes` for multiline preliminary quotation calculation.
+    - `GET /api/industrial/v2/quotes/{quoteId}/pdf` for streaming official signed `%PDF-1.4` quotation documents.
+  - Enriched Heating Chamber unified configuration bundle (`GET /api/industrial/v2/configurations/heating-chamber/bundle`) with full `commercial` block:
+    - Itemized lines for Horner X5 ($890.00 / 89,000 ¢), NOVUS N1200 ($480.00 / 48,000 ¢), and TZone THT-02 ($75.00 / 7,500 ¢).
+    - Catalog total of $1,445.00 USD (144,500 cents).
+    - Missing roles explicitly documented unpriced (`power_actuator_ssr`, `electric_heater_element`) enforcing Zero Fabricated SKUs doctrine.
+    - Readiness flags decoupled: `ready_for_3d_presentation: true`, `ready_for_commercial_estimate: true`, `ready_for_procurement: false` (gated by G5 incomplete loop verdict).
+  - Updated authoritative OpenAPI 3.1 specification (`docs/openapi-industrial-v2-demo.yaml`) and synced to Nginx root.
+  - Updated Meta Muse operator testing guide (`docs/industrial/muse-operator-demo-p0.md`) with live offer and multiline curl verification commands, natural language operator prompt, and commercial rubric criteria.
+- **Artifacts Produced:**
+  - `docs/gates/G9_COMMERCE_V2.md`
+  - `docs/gates/G9.md`
+  - `docs/openapi-industrial-v2-demo.yaml` (updated)
+  - `docs/industrial/muse-operator-demo-p0.md` (updated)
+  - `docs/industrial/IMPLEMENTATION_STATE.md` (updated)
 
 ---
 

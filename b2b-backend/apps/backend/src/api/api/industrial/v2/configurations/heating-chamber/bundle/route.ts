@@ -1,6 +1,6 @@
 import type { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
 import { verifyOptionalMuseAuth } from "../../../auth-helper"
-import { buildHeatingChamberBundle } from "../../../../../../../modules/industrial-config/data/heating-chamber-pilot"
+import { buildHeatingChamberBundleWithCommerce } from "../../../../../../../modules/industrial-config/data/heating-chamber-pilot"
 
 export const AUTHENTICATE = false
 
@@ -33,7 +33,7 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
     res.removeHeader("Access-Control-Allow-Credentials")
   }
 
-  const rawBundle = buildHeatingChamberBundle()
+  const rawBundle = await buildHeatingChamberBundleWithCommerce()
 
   // Return unified bundle supporting both Megaplan §19 core keys and pilot contract keys
   const enrichedBundle = {
@@ -56,6 +56,7 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
       rule_set_version: rawBundle.evaluation.rule_set_version,
       evaluations: rawBundle.evaluation.evaluations,
     },
+    commercial: rawBundle.commercial,
   }
 
   return res.status(200).json(enrichedBundle)

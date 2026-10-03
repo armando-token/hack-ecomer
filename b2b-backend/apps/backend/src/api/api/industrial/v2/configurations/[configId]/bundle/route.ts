@@ -1,6 +1,6 @@
 import type { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
 import {
-  buildHeatingChamberBundle,
+  buildHeatingChamberBundleWithCommerce,
   HEATING_CHAMBER_PILOT_ID,
 } from "../../../../../../../modules/industrial-config/data/heating-chamber-pilot"
 
@@ -37,7 +37,7 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
     configId === "heating-chamber" ||
     configId === "cfg_heating_chamber_pilot"
   ) {
-    const bundle = buildHeatingChamberBundle()
+    const bundle = await buildHeatingChamberBundleWithCommerce()
     return res.status(200).json(bundle)
   }
 

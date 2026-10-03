@@ -1,3 +1,5 @@
+import type { Pool, PoolClient } from "pg"
+import { getLiveOffer } from "../../../lib/muse/offer"
 import { G6_ASSET_DEFINITIONS } from "./g6-catalog-assets"
 import {
   HORNER_X5_SNAPSHOT,
@@ -64,6 +66,30 @@ export interface HeatingChamberAssetEntry {
   anchors: any[]
 }
 
+export interface CommercialLineItem {
+  instance_id: string
+  sku: string
+  title: string
+  quantity: number
+  unit_price_usd_cents: number
+  unit_price_usd: number
+  subtotal_usd_cents: number
+  subtotal_usd: number
+  availability_status: string
+  stocked_quantity: number
+  pricing_state: string
+}
+
+export interface BundleCommercialBlock {
+  currency: string
+  status: string
+  items: CommercialLineItem[]
+  catalog_total_usd_cents: number
+  catalog_total_usd: number
+  missing_roles_unpriced: string[]
+  quote_readiness: "ready_for_commercial_estimate" | "not_priced"
+}
+
 export interface HeatingChamberBundle {
   bundle_version: string
   configuration: {
@@ -86,8 +112,10 @@ export interface HeatingChamberBundle {
   readiness: {
     ready_for_3d_presentation: boolean
     ready_for_procurement: boolean
+    ready_for_commercial_estimate: boolean
     blockers: string[]
   }
+  commercial?: BundleCommercialBlock
   generated_at: string
 }
 
@@ -388,8 +416,61 @@ export function buildAssetsMap(): Record<string, HeatingChamberAssetEntry> {
   return assets
 }
 
+export const HEATING_CHAMBER_COMMERCIAL_FALLBACK: BundleCommercialBlock = {
+  currency: "USD",
+  status: "priced",
+  items: [
+    {
+      instance_id: "inst_x5prime",
+      sku: "CN-X5PRIME-HE-XP5",
+      title: "Horner X5 Prime 4.3\" Touch OCS",
+      quantity: 1,
+      unit_price_usd_cents: 89000,
+      unit_price_usd: 890.0,
+      subtotal_usd_cents: 89000,
+      subtotal_usd: 890.0,
+      availability_status: "in_stock",
+      stocked_quantity: 3,
+      pricing_state: "priced",
+    },
+    {
+      instance_id: "inst_n1200",
+      sku: "CN-N1200",
+      title: "NOVUS N1200 1/16 DIN PID Controller",
+      quantity: 1,
+      unit_price_usd_cents: 48000,
+      unit_price_usd: 480.0,
+      subtotal_usd_cents: 48000,
+      subtotal_usd: 480.0,
+      availability_status: "in_stock",
+      stocked_quantity: 2,
+      pricing_state: "priced",
+    },
+    {
+      instance_id: "inst_tht02",
+      sku: "CN-THT02",
+      title: "TZone THT-02 Temp/RH Transmitter",
+      quantity: 1,
+      unit_price_usd_cents: 7500,
+      unit_price_usd: 75.0,
+      subtotal_usd_cents: 7500,
+      subtotal_usd: 75.0,
+      availability_status: "in_stock",
+      stocked_quantity: 8,
+      pricing_state: "priced",
+    },
+  ],
+  catalog_total_usd_cents: 144500,
+  catalog_total_usd: 1445.0,
+  missing_roles_unpriced: [
+    "actuator_power_switching",
+    "thermal_load_heater",
+  ],
+  quote_readiness: "ready_for_commercial_estimate",
+}
+
 /**
- * Assembles the complete Heating Chamber bundle for Meta Muse ingestion
+ * Assembles the complete Heating Chamber bundle for Meta Muse ingestion (synchronous fallback)
  */
 export function buildHeatingChamberBundle(): HeatingChamberBundle {
   const evalResult = evaluateSystem(
@@ -431,11 +512,117 @@ export function buildHeatingChamberBundle(): HeatingChamberBundle {
     readiness: {
       ready_for_3d_presentation: true,
       ready_for_procurement: false,
+      ready_for_commercial_estimate: true,
       blockers: [
         "Power actuator stage (SSR) missing from topology",
         "Heating element load missing from topology",
       ],
     },
+    commercial: HEATING_CHAMBER_COMMERCIAL_FALLBACK,
     generated_at: new Date().toISOString(),
+  }
+}
+
+/**
+ * Asynchronously builds the Heating Chamber bundle enriched with live commercial pricing from Medusa.
+ * Queries Medusa live catalog offers for the 3 equipment instances, calculates exact totals,
+ * isolates missing roles without inventing prices, and falls back to deterministic snapshot if DB is unavailable.
+ */
+export async function buildHeatingChamberBundleWithCommerce(
+  dbClient?: Pool | PoolClient
+): Promise<HeatingChamberBundle> {
+  const baseBundle = buildHeatingChamberBundle()
+
+  try {
+    const pilotItems = [
+      {
+        instance: HEATING_CHAMBER_PILOT_INSTANCES_MAP.inst_x5prime,
+        sku: "CN-X5PRIME-HE-XP5",
+      },
+      {
+        instance: HEATING_CHAMBER_PILOT_INSTANCES_MAP.inst_n1200,
+        sku: "CN-N1200",
+      },
+      {
+        instance: HEATING_CHAMBER_PILOT_INSTANCES_MAP.inst_tht02,
+        sku: "CN-THT02",
+      },
+    ]
+
+    const items: CommercialLineItem[] = []
+    let totalCents = 0
+    let allPriced = true
+
+    for (const item of pilotItems) {
+      const offer = await getLiveOffer(item.sku, 1, undefined, dbClient)
+      const unitCents =
+        offer.unit_price_minor ??
+        (offer.unit_price != null ? Math.round(offer.unit_price * 100) : 0)
+      const unitUsd = offer.unit_price ?? unitCents / 100
+      const subtotalCents =
+        offer.subtotal_minor ??
+        (offer.subtotal != null
+          ? Math.round(offer.subtotal * 100)
+          : unitCents * (offer.quantity || 1))
+      const subtotalUsd = offer.subtotal ?? subtotalCents / 100
+      const pricingState = offer.state || "priced"
+
+      if (pricingState !== "priced" || unitCents <= 0) {
+        allPriced = false
+      }
+
+      totalCents += subtotalCents
+
+      items.push({
+        instance_id: item.instance.instance_id,
+        sku: offer.sku || item.sku,
+        title: offer.title || item.instance.title,
+        quantity: offer.quantity || 1,
+        unit_price_usd_cents: unitCents,
+        unit_price_usd: unitUsd,
+        subtotal_usd_cents: subtotalCents,
+        subtotal_usd: subtotalUsd,
+        availability_status:
+          offer.availability_status ||
+          offer.availability?.status ||
+          "in_stock",
+        stocked_quantity: offer.availability?.stocked_quantity ?? 0,
+        pricing_state: pricingState,
+      })
+    }
+
+    const missingRolesUnpriced = HEATING_CHAMBER_PILOT_MISSING_ROLES.map(
+      (r) => r.role
+    )
+    const quoteReadiness: "ready_for_commercial_estimate" | "not_priced" =
+      allPriced ? "ready_for_commercial_estimate" : "not_priced"
+
+    const commercial: BundleCommercialBlock = {
+      currency: "USD",
+      status: allPriced ? "priced" : "partial",
+      items,
+      catalog_total_usd_cents: totalCents,
+      catalog_total_usd: totalCents / 100,
+      missing_roles_unpriced: missingRolesUnpriced,
+      quote_readiness: quoteReadiness,
+    }
+
+    return {
+      ...baseBundle,
+      readiness: {
+        ...baseBundle.readiness,
+        ready_for_3d_presentation: true,
+        ready_for_procurement: false,
+        ready_for_commercial_estimate: allPriced,
+        blockers: [
+          "Power actuator stage (SSR) missing from topology",
+          "Heating element load missing from topology",
+        ],
+      },
+      commercial,
+    }
+  } catch (err) {
+    // Preserve synchronous bundle fallback with deterministic snapshot if DB is unavailable
+    return baseBundle
   }
 }

@@ -1,0 +1,144 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "schema_version": "oem_sources_manifest/1.0",
+  "generated_at": "2026-10-03T22:42:00Z",
+  "gate": "REAL_OEM_SYNC",
+  "governing_document": "docs/industrial/MEGAPLAN_MUSE_API_3D_V2.md",
+  "edge_nginx": {
+    "server_name": "data.controlnautas.com",
+    "protocols": ["TLSv1.2", "TLSv1.3"],
+    "ports": [80, 443],
+    "ssl_certificate": "/etc/letsencrypt/live/data.controlnautas.com/fullchain.pem",
+    "cors_header": "Access-Control-Allow-Origin *",
+    "cache_control": "public, max-age=86400",
+    "autoindex": false,
+    "locations": {
+      "/demo/datasheets/": {
+        "alias": "/home/ec2-user/projects/hack-ecomer/docs/datasheets/",
+        "public_url_prefix": "https://data.controlnautas.com/demo/datasheets/"
+      },
+      "/oem-sources/": {
+        "alias": "/home/ec2-user/projects/hack-ecomer/docs/industrial/oem-sources/",
+        "public_url_prefix": "https://data.controlnautas.com/oem-sources/"
+      }
+    }
+  },
+  "sources_audit": [
+    {
+      "source_id": "SRC-28",
+      "relative_path": "horner-x4/MAN1137_21_EN_X4_UM.pdf",
+      "public_url": "https://data.controlnautas.com/oem-sources/horner-x4/MAN1137_21_EN_X4_UM.pdf",
+      "sha256": "35c647aa6b1d8595a7f674e0d203ad77023a27d7ee8fd70c83e1bb3f53d0f649",
+      "size_bytes": 7214725,
+      "page_count": 145,
+      "review_status": "reference_oem_non_pilot",
+      "manufacturer": "Horner Automation",
+      "model": "X4",
+      "model_name": "X4 OCS User Manual",
+      "pilot_sku_binding": null,
+      "audit_finding": "Horner X4 is a 3.5-inch compact OCS (1/4 DIN 96x96mm). Distinct from pilot SKU CN-X5PRIME-HE-XP5 (4.3-inch widescreen 125x96mm). Must NOT replace or mutate pilot catalog or 3D models."
+    },
+    {
+      "source_id": "SRC-29",
+      "relative_path": "horner-x4/MAN1138_R21_X4_DS.pdf",
+      "public_url": "https://data.controlnautas.com/oem-sources/horner-x4/MAN1138_R21_X4_DS.pdf",
+      "sha256": "7885574524f1c23cd687a442beb690f45142420913b2684dd464293aa3878f40",
+      "size_bytes": 6497363,
+      "page_count": 27,
+      "review_status": "reference_oem_non_pilot",
+      "manufacturer": "Horner Automation",
+      "model": "X4",
+      "model_name": "X4 OCS Datasheet",
+      "pilot_sku_binding": null,
+      "audit_finding": "Horner X4 datasheet (MAN1138 R21). Governs X4 pinout and specifications. Serves as non-pilot reference OEM documentation."
+    },
+    {
+      "source_id": "SRC-30",
+      "relative_path": "tzone-tht02/THT02_users_manual_v1.1.pdf",
+      "public_url": "https://data.controlnautas.com/oem-sources/tzone-tht02/THT02_users_manual_v1.1.pdf",
+      "sha256": "48718e71596413492f2a871e520c1567e6fe1e8abe05b89822a0f21e091e6a7c",
+      "size_bytes": 671763,
+      "page_count": 9,
+      "review_status": "verified_oem",
+      "manufacturer": "TZone Digital",
+      "model": "THT-02",
+      "model_name": "TZ THT-02 Temperature and humidity Sensor",
+      "pilot_sku_binding": "CN-THT02",
+      "audit_finding": "Exact match to existing datasheet CN-THT02.pdf (identical SHA-256). Manufacturer documents cylindrical probe (140x16 mm) with flying leads and snap-on bracket; G4/G6 envelope divergence reconciled in manifests/tzone-tht02.md."
+    },
+    {
+      "source_id": "SRC-31",
+      "relative_path": "unitronics-or-misc/U_PumpHouse_Install.pdf",
+      "public_url": "https://data.controlnautas.com/oem-sources/unitronics-or-misc/U_PumpHouse_Install.pdf",
+      "sha256": "192542c508cae7a0fec7ad0fddd89c7a7a75861817b9e85013ed3ad9b1a93059",
+      "size_bytes": 799195,
+      "page_count": 4,
+      "review_status": "out_of_scope_unbound",
+      "manufacturer": "King Electrical Mfg. Company",
+      "model": "U Series Pumphouse Heater",
+      "model_name": "U Series Pumphouse Heater Installation & Operating Instructions",
+      "pilot_sku_binding": null,
+      "audit_finding": "King Electrical Mfg. Co. U-Series pumphouse radiant space heater (Item #66661). Not Unitronics PLC. Out of scope for heating chamber pilot circuit; unbound to any catalog SKU."
+    },
+    {
+      "source_id": "SRC-32",
+      "relative_path": "unitronics-or-misc/U_WEB.pdf",
+      "public_url": "https://data.controlnautas.com/oem-sources/unitronics-or-misc/U_WEB.pdf",
+      "sha256": "7a0517e6f5bc7e6427236436b829412e82da38ac7ac935d39250518e39dc4ce9",
+      "size_bytes": 731152,
+      "page_count": 1,
+      "review_status": "out_of_scope_unbound",
+      "manufacturer": "King Electrical Mfg. Company",
+      "model": "U Series Pumphouse Heater",
+      "model_name": "U Series Pumphouse Heater Engineering Specifications",
+      "pilot_sku_binding": null,
+      "audit_finding": "King Electrical Mfg. Co. U-Series engineering specification sheet (U1250-U24100). Not Unitronics PLC. Out of scope for heating chamber pilot circuit; unbound to any catalog SKU."
+    }
+  ],
+  "verified_pilot_catalog_sources": [
+    {
+      "source_id": "SRC-07",
+      "filename": "CN-X5PRIME-HE-XP5.pdf",
+      "public_url": "https://data.controlnautas.com/demo/datasheets/CN-X5PRIME-HE-XP5.pdf",
+      "sku": "CN-X5PRIME-HE-XP5",
+      "model": "HE-XP5",
+      "manufacturer": "Horner Automation",
+      "size_bytes": 2220450,
+      "sha256": "70278736e6b8f3ab170876274a02a3ba7be0942bc2b0995bf7d5742f8bd1d742"
+    },
+    {
+      "source_id": "SRC-08",
+      "filename": "CN-N1200.pdf",
+      "public_url": "https://data.controlnautas.com/demo/datasheets/CN-N1200.pdf",
+      "sku": "CN-N1200",
+      "model": "N1200",
+      "manufacturer": "NOVUS Automation",
+      "size_bytes": 1280893,
+      "sha256": "53384720600d70cdce641350c30b0b86ad5e44a8b37291dbaef8ee0852f86554"
+    },
+    {
+      "source_id": "SRC-09",
+      "filename": "CN-THT02.pdf",
+      "public_url": "https://data.controlnautas.com/demo/datasheets/CN-THT02.pdf",
+      "sku": "CN-THT02",
+      "model": "THT-02",
+      "manufacturer": "TZone Digital",
+      "size_bytes": 671763,
+      "sha256": "48718e71596413492f2a871e520c1567e6fe1e8abe05b89822a0f21e091e6a7c"
+    }
+  ],
+  "strict_catalog_protection_doctrine": {
+    "pilot_skus": ["CN-X5PRIME-HE-XP5", "CN-N1200", "CN-THT02"],
+    "missing_roles_unlabeled": [
+      "power_switching_interface (SSR)",
+      "heating_element (Heater)",
+      "primary_process_temperature_probe",
+      "dc_instrument_power_supply"
+    ],
+    "muse_behavioral_rules": [
+      "Muse MUST load ONLY catalog GLBs for pilot SKUs: CN-X5PRIME-HE-XP5, CN-N1200, CN-THT02.",
+      "SSR and heater heating elements MUST remain unlabeled generic missing_roles; never invent unverified equipment.",
+      "Muse SHOULD open OEM PDFs over HTTPS (https://data.controlnautas.com/demo/datasheets/... and /oem-sources/...) to inspect physical appearance, terminal block layouts, and bezel details. Muse MUST NEVER invent alternate controllers/sensors that replace catalog GLBs."
+    ]
+  }
+}

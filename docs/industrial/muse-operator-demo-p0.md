@@ -28,7 +28,27 @@ The system provides:
 - **OpenAPI 3.1 Spec:** `https://data.controlnautas.com/docs/openapi-industrial-v2-demo.yaml`
 - **Storefront Solution Studio:** `https://data.controlnautas.com/solution` (redirects to `/us/solution`)
 
-### 2.2 Bearer Authentication
+### 2.2 Public OEM Documentation & Datasheets (HTTPS Delivery)
+All pilot datasheets and OEM source manuals are published directly via Nginx with TLS 1.3, CORS `*`, and public caching:
+- **Pilot Catalog Datasheets:**
+  - `https://data.controlnautas.com/demo/datasheets/CN-N1200.pdf` (NOVUS N1200 Universal Process Controller User Manual)
+  - `https://data.controlnautas.com/demo/datasheets/CN-X5PRIME-HE-XP5.pdf` (Horner X5 Prime OCS Datasheet)
+  - `https://data.controlnautas.com/demo/datasheets/CN-THT02.pdf` (TZone THT-02 Sensor Manual)
+- **OEM Source Archive & Reference Manuals:**
+  - `https://data.controlnautas.com/oem-sources/horner-x4/MAN1137_21_EN_X4_UM.pdf` (Horner X4 User Manual)
+  - `https://data.controlnautas.com/oem-sources/horner-x4/MAN1138_R21_X4_DS.pdf` (Horner X4 Datasheet)
+  - `https://data.controlnautas.com/oem-sources/tzone-tht02/THT02_users_manual_v1.1.pdf` (TZone THT-02 User Manual V1.1)
+  - `https://data.controlnautas.com/oem-sources/unitronics-or-misc/U_PumpHouse_Install.pdf` (King Electric U-Series Pumphouse Heater Installation Guide)
+  - `https://data.controlnautas.com/oem-sources/unitronics-or-misc/U_WEB.pdf` (King Electric U-Series Pumphouse Heater Overview)
+
+### 2.3 Explicit Behavioral Rules for Meta Muse Operators (Gate REAL_OEM_SYNC)
+> [!IMPORTANT]
+> **Strict Behavioral Doctrine for Muse Operators:**
+> - Muse MUST load ONLY catalog GLBs for pilot SKUs: `CN-X5PRIME-HE-XP5`, `CN-N1200`, `CN-THT02`.
+> - SSR and heater heating elements MUST remain unlabeled generic missing_roles; never invent unverified equipment.
+> - Muse SHOULD open OEM PDFs over HTTPS (`https://data.controlnautas.com/demo/datasheets/...` and `/oem-sources/...`) to inspect physical appearance, terminal block layouts, and bezel details. Muse MUST NEVER invent alternate controllers/sensors that replace catalog GLBs.
+
+### 2.4 Bearer Authentication
 All requests to protected v2 endpoints accept a Bearer token:
 ```bash
 export MUSE_API_TOKEN="[REDACTED_MUSE_BEARER_TOKEN]"
@@ -118,8 +138,8 @@ Access-Control-Allow-Origin: *
 
 ---
 
-### Step 3.6: Heating Chamber Unified Engineering Bundle (Gate G8)
-Fetch the consolidated spatial and engineering configuration bundle for the Heating Chamber Pilot.
+### Step 3.6: Heating Chamber Unified Engineering Bundle (Gate G8 & G9)
+Fetch the consolidated spatial and engineering configuration bundle for the Heating Chamber Pilot, including the commercial block and readiness flags:
 
 ```bash
 curl -s https://data.controlnautas.com/api/industrial/v2/configurations/heating-chamber/bundle | jq .
@@ -129,15 +149,59 @@ curl -s https://data.controlnautas.com/api/industrial/v2/configurations/heating-
 - `process_family`: `"heating_chamber"`
 - `components`: Horner X5 (`CN-X5PRIME-HE-XP5`), NOVUS N1200 (`CN-N1200`), TZone THT-02 (`CN-THT02`).
 - `spatial_instances`: Pre-computed world translations and rotations in meters.
-- `evaluation`: Gate G5 deterministic evaluation status.
+- `evaluation`: Gate G5 deterministic evaluation status (`does_not_meet` due to missing SSR/heater).
+- `commercial`:
+  - `currency`: `"USD"`
+  - `catalog_total_usd_cents`: `144500`
+  - `catalog_total_usd`: `1445.00`
+  - `items`: 3 itemized lines with live Medusa unit prices ($890.00, $480.00, $75.00)
+  - `missing_roles_unpriced`: `["power_actuator_ssr", "electric_heater_element"]`
+  - `quote_readiness`: `"ready_for_preliminary_estimate"`
+- `readiness`:
+  - `ready_for_3d_presentation`: `true`
+  - `ready_for_commercial_estimate`: `true`
+  - `ready_for_procurement`: `false`
 
 ---
 
-### Step 3.7: Instant Preliminary BOM Quotation (Gate G9)
-Request a real-time multiline BOM quotation in USD.
+### Step 3.7: Live Commercial Offers & Multiline Quotes (Gate G9)
+
+Verify live pricing from the Medusa commerce engine without invented prices or hallucinated numbers. All pricing is executed using exact integer minor currency units (USD cents).
+
+#### 3.7.1 Query Individual Live Commercial Offers
+
+Query individual verified component pricing:
+
+**1. NOVUS N1200 PID Controller Offer ($480.00 USD / 48,000 cents):**
+```bash
+curl -s "https://data.controlnautas.com/api/industrial/v2/products/CN-N1200/offer?quantity=1" | jq .
+```
+
+**2. Horner X5 Prime OCS Offer ($890.00 USD / 89,000 cents):**
+```bash
+curl -s "https://data.controlnautas.com/api/industrial/v2/products/CN-X5PRIME-HE-XP5/offer?quantity=1" | jq .
+```
+
+**3. TZone THT-02 Transmitter Offer ($75.00 USD / 7,500 cents):**
+```bash
+curl -s "https://data.controlnautas.com/api/industrial/v2/products/CN-THT02/offer?quantity=1" | jq .
+```
+
+**Expected Single Offer Response Highlights:**
+- `state`: `"priced"`
+- `currency`: `"usd"`
+- `unit_price_minor`: Exact integer cents (e.g. `48000` for N1200, `89000` for X5 Prime, `7500` for THT-02).
+- `unit_price`: Decimal amount (e.g. `480`, `890`, `75`).
+- `availability`: Real-time inventory status (`"in_stock"`).
+- `tax_status`: `"tax_excluded"`.
+- `shipping_status`: `"to_be_confirmed"`.
+
+#### 3.7.2 Create Multiline Preliminary BOM Quote
+
+Generate an immutable multiline quotation for all three pilot devices:
 
 ```bash
-curl -s -X POST https://data.controlnautas.com/api/muse/v1/preliminary-quotes \
+curl -s -X POST https://data.controlnautas.com/api/industrial/v2/preliminary-quotes \
   -H "Content-Type: application/json" \
   -d '{
     "items": [
@@ -152,29 +216,34 @@ curl -s -X POST https://data.controlnautas.com/api/muse/v1/preliminary-quotes \
   }' | jq .
 ```
 
+*(Note: Legacy `/api/muse/v1/preliminary-quotes` endpoint is also supported for backward compatibility).*
+
 **Expected Response Highlights:**
 - `quote_id`: `qte_...`
-- `status`: `preliminary`
-- `currency`: `USD`
-- `items`: Itemized lines with Medusa 2 USD unit prices and subtotal calculated via exact integer cents.
-- `pdf_download_url`: `https://data.controlnautas.com/api/muse/v1/quotes/{quote_id}/pdf`
+- `status`: `"preliminary"` (or `"priced"`)
+- `currency`: `"USD"`
+- `total_cents`: `144500` ($1,445.00 USD exact sum: $890 + $480 + $75)
+- `total_usd`: `1445.00`
+- `items`: 3 itemized lines with unit prices and subtotals in cents and decimal USD
+- `pdf_download_url`: `https://data.controlnautas.com/api/industrial/v2/quotes/{quoteId}/pdf?token=...`
 
 ---
 
 ### Step 3.8: Official Correlated PDF Quotation Download (Gate G9)
-Download the signed engineering quotation PDF compiled by the native Python ReportLab worker.
+Stream the official signed engineering quotation PDF compiled by the native Python ReportLab worker:
 
 ```bash
-curl -s -o quote_demo.pdf \
-  https://data.controlnautas.com/api/muse/v1/quotes/[QUOTE_ID]/pdf
+curl -s -o quote.pdf "https://data.controlnautas.com/api/industrial/v2/quotes/{quoteId}/pdf?token=..."
 
 # Verify PDF header magic bytes (%PDF-1.4)
-head -n 1 quote_demo.pdf
+head -n 1 quote.pdf
 ```
+
+*(Note: Also downloadable via legacy path `https://data.controlnautas.com/api/muse/v1/quotes/{quoteId}/pdf`).*
 
 **Expected Output:**
 - File begins with `%PDF-1.4`.
-- Valid binary PDF document containing Controlnautas letterhead, itemized BOM table, prices in USD, and correlated job ID.
+- Valid binary PDF document containing Controlnautas letterhead, itemized BOM table, exact USD prices ($1,445.00 total), and correlated job ID.
 
 ---
 
@@ -204,8 +273,11 @@ When interacting directly within the Meta Muse conversational UI, execute the fo
 **Expected Muse Response:**
 > The agent should consult the Gate G5 evaluator and report **does_not_meet** (`INCOMPLETE_CONTROL_LOOP`). It must explain that the instrumentation controllers require an intermediate SSR/power actuator and heating element to safely complete the thermal loop.
 
-### Prompt 3: Commercial BOM Quotation
-> "Generate a preliminary B2B quotation for 1 unit of Horner X5 (CN-X5PRIME-HE-XP5), 1 unit of NOVUS N1200 (CN-N1200), and 1 unit of TZone THT-02 (CN-THT02) via https://data.controlnautas.com/api/muse/v1/preliminary-quotes and provide the official PDF download link."
+### Prompt 3: Commercial BOM Quotation & Live Pricing Verification
+> "Query live pricing from https://data.controlnautas.com/api/industrial/v2/products/{sku}/offer for each component. Do NOT use memorized training data or stale chat memory. For the Heating Chamber solution, generate a multiline quote for CN-X5PRIME-HE-XP5, CN-N1200, and CN-THT02, keeping SSR and heater unpriced as missing roles."
+
+**Expected Muse Response:**
+> The agent should query live pricing from the `/offer` endpoints, report verified prices ($890.00 for Horner X5, $480.00 for NOVUS N1200, $75.00 for TZone THT-02), calculate the exact total of $1,445.00 USD, generate the multiline preliminary quotation via `https://data.controlnautas.com/api/industrial/v2/preliminary-quotes`, provide the official signed PDF download URL (`https://data.controlnautas.com/api/industrial/v2/quotes/{quoteId}/pdf?token=...`), and explicitly report `power_actuator_ssr` and `electric_heater_element` as unpriced missing roles without fabricating dummy SKUs.
 
 ---
 
@@ -214,14 +286,19 @@ When interacting directly within the Meta Muse conversational UI, execute the fo
 | Inspection Item | Success Criteria | Operator Result |
 |---|---|---|
 | **1. Public HTTPS** | Strict TLS 1.3 on port 443; zero port 9000 leaks | `[ PASS / FAIL ]` |
-| **2. OpenAPI 3.1** | Valid YAML schema accessible at `/docs/...` | `[ PASS / FAIL ]` |
-| **3. API v2 Discovery** | Capabilities and parametric search return verified facts | `[ PASS / FAIL ]` |
+| **2. OpenAPI 3.1** | Valid YAML schema accessible at `/docs/openapi-industrial-v2-demo.yaml` | `[ PASS / FAIL ]` |
+| **3. API v2 Discovery** | Capabilities and parametric search return verified facts and schemas | `[ PASS / FAIL ]` |
 | **4. 3D GLB Delivery** | All 3 GLBs download with HTTP 200, CORS `*`, and immutable cache | `[ PASS / FAIL ]` |
-| **5. Spatial Scale** | Bounding box delta is 0.0 mm; units in meters | `[ PASS / FAIL ]` |
+| **5. Spatial Scale** | Bounding box delta is 0.0 mm; units in meters (+Y up, +Z front) | `[ PASS / FAIL ]` |
 | **6. G5 Safety Engine** | Incomplete control loop safely rejected with `does_not_meet` | `[ PASS / FAIL ]` |
-| **7. USD Quotation** | Accurate multiline BOM pricing without float rounding | `[ PASS / FAIL ]` |
-| **8. Signed PDF** | Valid `%PDF-1.4` binary downloaded and visually legible | `[ PASS / FAIL ]` |
-| **9. Solution Studio** | `/solution` renders clean Next.js English documentation | `[ PASS / FAIL ]` |
+| **7. Live Commercial Offers** | `/offer` endpoints return live Medusa pricing ($890.00, $480.00, $75.00) in USD cents + decimal | `[ PASS / FAIL ]` |
+| **8. Multiline BOM Quotation** | `POST /preliminary-quotes` calculates exact $1,445.00 total (144,500 cents) without rounding errors | `[ PASS / FAIL ]` |
+| **9. Heating Chamber Commercial Block** | Unified bundle returns `commercial` object ($1,445.00 total) and `ready_for_commercial_estimate: true` | `[ PASS / FAIL ]` |
+| **10. Correlated Signed PDF** | Streamed `/quotes/{id}/pdf` returns valid `%PDF-1.4` binary compiled by ReportLab worker | `[ PASS / FAIL ]` |
+| **11. Missing Roles Discipline** | SSR and heater elements remain strictly unpriced as `missing_roles_unpriced` (Zero Fabricated SKUs) | `[ PASS / FAIL ]` |
+| **12. Solution Studio** | `/solution` renders clean Next.js English documentation with quotation quickstart | `[ PASS / FAIL ]` |
+| **13. OEM PDF Delivery** | All 8 PDF datasheets & OEM manuals return HTTP 200 over HTTPS with CORS `*` | `[ PASS / FAIL ]` |
+| **14. Catalog Protection** | Muse loads ONLY pilot catalog GLBs; SSR/heater remain unlabeled missing roles | `[ PASS / FAIL ]` |
 
 ---
 

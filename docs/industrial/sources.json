@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "generated_at": "2026-10-03T21:26:00Z",
-  "gate": "G4",
+  "generated_at": "2026-10-03T22:42:00Z",
+  "gate": "REAL_OEM_SYNC",
   "host": "ec2-user@ip-172-31-80-36.ec2.internal",
   "environment": "EC2 Linux (Amazon Linux 2023.12 / kernel 6.18)",
   "working_directory": "/home/ec2-user/projects/hack-ecomer",
@@ -435,6 +435,105 @@
       "applicable_variants": [
         "variant_01M41R193J5MPJ16MTX9CAWWRM"
       ]
+    },
+    {
+      "id": "SRC-28",
+      "name": "horner-x4/MAN1137_21_EN_X4_UM.pdf",
+      "type": "oem_manual",
+      "path": "/home/ec2-user/projects/hack-ecomer/docs/industrial/oem-sources/horner-x4/MAN1137_21_EN_X4_UM.pdf",
+      "public_url": "https://data.controlnautas.com/oem-sources/horner-x4/MAN1137_21_EN_X4_UM.pdf",
+      "size_bytes": 7214725,
+      "sha256": "35c647aa6b1d8595a7f674e0d203ad77023a27d7ee8fd70c83e1bb3f53d0f649",
+      "timestamp": "2026-10-03T22:39:00Z",
+      "license": "Manufacturer public technical documentation (Horner Automation)",
+      "usage_scope": "Horner X4 User Manual; reference OEM documentation (non-pilot controller, distinct from X5 Prime)",
+      "review_status": "reference_oem_non_pilot",
+      "manufacturer": "Horner Automation",
+      "model": "X4",
+      "model_name": "X4 OCS User Manual",
+      "revision": "MAN1137-21-EN",
+      "page_count": 145,
+      "notes": "Official Horner X4 User Manual (MAN1137-21-EN, 145 pages). Reference OEM documentation for non-pilot controller; must NOT overwrite or substitute pilot SKU CN-X5PRIME-HE-XP5."
+    },
+    {
+      "id": "SRC-29",
+      "name": "horner-x4/MAN1138_R21_X4_DS.pdf",
+      "type": "oem_datasheet",
+      "path": "/home/ec2-user/projects/hack-ecomer/docs/industrial/oem-sources/horner-x4/MAN1138_R21_X4_DS.pdf",
+      "public_url": "https://data.controlnautas.com/oem-sources/horner-x4/MAN1138_R21_X4_DS.pdf",
+      "size_bytes": 6497363,
+      "sha256": "7885574524f1c23cd687a442beb690f45142420913b2684dd464293aa3878f40",
+      "timestamp": "2026-10-03T22:39:00Z",
+      "license": "Manufacturer public technical documentation (Horner Automation)",
+      "usage_scope": "Horner X4 Datasheet; reference OEM documentation (non-pilot controller, distinct from X5 Prime)",
+      "review_status": "reference_oem_non_pilot",
+      "manufacturer": "Horner Automation",
+      "model": "X4",
+      "model_name": "X4 OCS Datasheet",
+      "revision": "MAN1138 R21",
+      "page_count": 27,
+      "notes": "Official Horner X4 Datasheet (MAN1138 R21, 27 pages). Reference OEM documentation for non-pilot controller; distinct dimensions and specifications from CN-X5PRIME-HE-XP5."
+    },
+    {
+      "id": "SRC-30",
+      "name": "tzone-tht02/THT02_users_manual_v1.1.pdf",
+      "type": "oem_manual",
+      "path": "/home/ec2-user/projects/hack-ecomer/docs/industrial/oem-sources/tzone-tht02/THT02_users_manual_v1.1.pdf",
+      "public_url": "https://data.controlnautas.com/oem-sources/tzone-tht02/THT02_users_manual_v1.1.pdf",
+      "size_bytes": 671763,
+      "sha256": "48718e71596413492f2a871e520c1567e6fe1e8abe05b89822a0f21e091e6a7c",
+      "timestamp": "2026-10-03T22:39:00Z",
+      "license": "Manufacturer public technical documentation (TZone Digital)",
+      "usage_scope": "Official TZone THT-02 User Manual V1.1; verified OEM ground truth matching catalog SKU CN-THT02",
+      "review_status": "verified_oem",
+      "manufacturer": "TZone Digital",
+      "model": "THT-02",
+      "model_name": "TZ THT-02 Temperature and humidity Sensor",
+      "revision": "User Manual V1.1",
+      "page_count": 9,
+      "applicable_variants": [
+        "variant_01M41R193J5MPJ16MTX9CAWWRM"
+      ],
+      "applicable_skus": [
+        "CN-THT02"
+      ],
+      "notes": "Official TZone THT-02 User Manual V1.1 (9 pages). Identical in content and SHA-256 hash to CN-THT02.pdf in datasheets. Authoritative verified OEM source for SKU CN-THT02."
+    },
+    {
+      "id": "SRC-31",
+      "name": "unitronics-or-misc/U_PumpHouse_Install.pdf",
+      "type": "oem_installation_guide",
+      "path": "/home/ec2-user/projects/hack-ecomer/docs/industrial/oem-sources/unitronics-or-misc/U_PumpHouse_Install.pdf",
+      "public_url": "https://data.controlnautas.com/oem-sources/unitronics-or-misc/U_PumpHouse_Install.pdf",
+      "size_bytes": 799195,
+      "sha256": "192542c508cae7a0fec7ad0fddd89c7a7a75861817b9e85013ed3ad9b1a93059",
+      "timestamp": "2026-10-03T22:39:00Z",
+      "license": "Manufacturer public technical documentation (King Electrical Mfg. Co.)",
+      "usage_scope": "King Electric U-Series Pumphouse Heater Installation Guide; out-of-scope space heater reference",
+      "review_status": "out_of_scope_unbound",
+      "manufacturer": "King Electrical Mfg. Company",
+      "model": "U Series Pumphouse Heater",
+      "model_name": "King Electric U-Series Pump House Freeze Protection Heater Installation Guide",
+      "page_count": 4,
+      "notes": "King Electric U-Series Pumphouse Heater Installation Guide (4 pages). Electro-mechanical radiant space heater with internal thermostat; out of scope for pilot heating chamber process control; unbound to any pilot SKU."
+    },
+    {
+      "id": "SRC-32",
+      "name": "unitronics-or-misc/U_WEB.pdf",
+      "type": "oem_product_overview",
+      "path": "/home/ec2-user/projects/hack-ecomer/docs/industrial/oem-sources/unitronics-or-misc/U_WEB.pdf",
+      "public_url": "https://data.controlnautas.com/oem-sources/unitronics-or-misc/U_WEB.pdf",
+      "size_bytes": 731152,
+      "sha256": "7a0517e6f5bc7e6427236436b829412e82da38ac7ac935d39250518e39dc4ce9",
+      "timestamp": "2026-10-03T22:39:00Z",
+      "license": "Manufacturer public technical documentation (King Electrical Mfg. Co.)",
+      "usage_scope": "King Electric U-Series Pumphouse Heater Specifications Sheet; out-of-scope space heater reference",
+      "review_status": "out_of_scope_unbound",
+      "manufacturer": "King Electrical Mfg. Company",
+      "model": "U Series Pumphouse Heater",
+      "model_name": "King Electric U-Series Pump House Radiant Heater Specifications Sheet",
+      "page_count": 1,
+      "notes": "King Electric U-Series Pump House Radiant Heater specifications leaflet (1 page, Drawing 4-08-244). Out of scope for pilot heating chamber loop; unbound to any pilot SKU."
     }
   ]
 }
