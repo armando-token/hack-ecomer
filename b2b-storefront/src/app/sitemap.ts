@@ -10,7 +10,6 @@ import { MetadataRoute } from "next"
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = `${company.siteUrl}/pe`
-  const products = await listAllCatalogProducts("pe")
 
   const staticPages: MetadataRoute.Sitemap = [
     {
@@ -52,22 +51,31 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }))
 
-  const categoryTree = await getCatalogCategoryTree("pe")
-  const categoryPages: MetadataRoute.Sitemap = flattenCategoryTree(
-    categoryTree
-  ).map(({ path }) => ({
-    url: `${baseUrl}/store/${path.join("/")}`,
-    lastModified: new Date(),
-    changeFrequency: "weekly",
-    priority: path.length > 1 ? 0.7 : 0.8,
-  }))
+  let categoryPages: MetadataRoute.Sitemap = []
+  try {
+    const categoryTree = await getCatalogCategoryTree("pe")
+    categoryPages = flattenCategoryTree(categoryTree).map(({ path }) => ({
+      url: `${baseUrl}/store/${path.join("/")}`,
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: path.length > 1 ? 0.7 : 0.8,
+    }))
+  } catch {
+    // Backend offline during build; sitemap revalidates every 3600s
+  }
 
-  const productPages: MetadataRoute.Sitemap = products.map((p) => ({
-    url: `${baseUrl}/products/${p.handle}`,
-    lastModified: new Date(p.updatedAt),
-    changeFrequency: "weekly",
-    priority: 0.9,
-  }))
+  let productPages: MetadataRoute.Sitemap = []
+  try {
+    const products = await listAllCatalogProducts("pe")
+    productPages = products.map((p) => ({
+      url: `${baseUrl}/products/${p.handle}`,
+      lastModified: new Date(p.updatedAt),
+      changeFrequency: "weekly",
+      priority: 0.9,
+    }))
+  } catch {
+    // Backend offline during build; sitemap revalidates every 3600s
+  }
 
   return [...staticPages, ...casePages, ...categoryPages, ...productPages]
 }

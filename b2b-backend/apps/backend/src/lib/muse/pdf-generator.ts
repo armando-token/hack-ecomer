@@ -33,12 +33,33 @@ export interface GenerateQuotePdfOptions {
   timeoutMs?: number
 }
 
-const DEFAULT_PYTHON_BIN = process.env.PYTHON_BIN || "python3"
+function resolveProjectRoot(): string {
+  if (process.env.PROJECT_ROOT && fs.existsSync(process.env.PROJECT_ROOT)) {
+    return process.env.PROJECT_ROOT
+  }
+  let curr = __dirname
+  for (let i = 0; i < 8; i++) {
+    if (fs.existsSync(path.join(curr, "scripts", "generate-quote-pdf.py"))) {
+      return curr
+    }
+    const parent = path.dirname(curr)
+    if (parent === curr) break
+    curr = parent
+  }
+  return path.resolve(process.cwd(), "../..")
+}
+
+const PROJECT_ROOT = resolveProjectRoot()
+const DEFAULT_PYTHON_BIN =
+  process.env.PYTHON_BIN ||
+  (fs.existsSync(path.join(PROJECT_ROOT, ".venv/bin/python"))
+    ? path.join(PROJECT_ROOT, ".venv/bin/python")
+    : "python3")
 const DEFAULT_SCRIPT_PATH =
   process.env.GENERATE_QUOTE_PDF_SCRIPT ||
-  "/home/ubuntu/hackday26/scripts/generate-quote-pdf.py"
+  path.join(PROJECT_ROOT, "scripts/generate-quote-pdf.py")
 const DEFAULT_STORAGE_BASE_DIR =
-  process.env.STORAGE_BASE_DIR || "/home/ubuntu/hackday26/storage"
+  process.env.STORAGE_BASE_DIR || path.join(PROJECT_ROOT, "storage")
 const DEFAULT_TIMEOUT_MS = 30000
 
 interface WorkerQueueItem {

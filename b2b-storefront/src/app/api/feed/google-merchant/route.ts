@@ -29,7 +29,12 @@ function feedAvailability(
 
 export async function GET() {
   const baseUrl = company.siteUrl
-  const products = await listAllCatalogProducts("pe")
+  let products: Awaited<ReturnType<typeof listAllCatalogProducts>> = []
+  try {
+    products = await listAllCatalogProducts("pe")
+  } catch {
+    // Backend offline during build; feed revalidates every 900s
+  }
 
   const eligible = products.filter((p) => {
     const price = p.display.price?.amount ?? 0

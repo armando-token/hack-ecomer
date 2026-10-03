@@ -1,0 +1,4 @@
+# Python requirements for Controlnautas scripts (generate-quote-pdf.py, generate-synthetic-datasheets.py)
+reportlab==5.0.1
+pillow==11.3.0
+charset-normalizer==3.5.2

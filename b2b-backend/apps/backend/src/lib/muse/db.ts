@@ -76,10 +76,17 @@ export interface DemoVariantSearchResult {
 
 /**
  * Postgres Connection Pool Configuration
- * Defaults to localhost medusa database credentials: postgres:password@localhost:5432/medusa
+ * Defaults to localhost medusa database credentials in development/test.
+ * In production mode, halts immediately (fail-fast) if DATABASE_URL is missing.
  */
+if (process.env.NODE_ENV === "production" && !process.env.DATABASE_URL?.trim()) {
+  throw new Error(
+    "[FATAL] DATABASE_URL is required in production mode. Refusing to boot with default fallback credentials."
+  )
+}
+
 const connectionString =
-  process.env.DATABASE_URL || "postgres://postgres:password@localhost:5432/medusa"
+  process.env.DATABASE_URL?.trim() || "postgres://postgres:password@localhost:5432/medusa"
 
 const poolConfig: PoolConfig = {
   connectionString,

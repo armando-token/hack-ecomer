@@ -193,7 +193,7 @@ describe("deriveAvailability", () => {
 
 describe("formatPriceLabel", () => {
   it("muestra consultar precio cuando requiere cotizacion", () => {
-    expect(formatPriceLabel(null, true)).toBe("Consultar precio")
+    expect(formatPriceLabel(null, true)).toBe("Request price")
   })
 
   it("formatea PEN", () => {

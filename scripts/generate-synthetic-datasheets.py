@@ -35,6 +35,7 @@ import os
 import sys
 import shutil
 import hashlib
+import argparse
 from typing import List, Dict, Any
 
 from reportlab.lib.pagesizes import letter
@@ -788,19 +789,34 @@ def generate_sku3_elements(styles) -> List[Any]:
 # ==============================================================================
 
 def main():
+    repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    default_docs = os.environ.get("DOCS_DATASHEETS_DIR") or os.path.join(repo_root, "docs", "datasheets")
+    default_backend = os.environ.get("BACKEND_DATASHEETS_DIR") or os.path.join(repo_root, "b2b-backend", "apps", "backend", "static", "demo", "datasheets")
+
+    parser = argparse.ArgumentParser(
+        description="Synthetic Datasheet PDF Generator for demo SKUs (ReportLab) — Controlnautas"
+    )
+    parser.add_argument(
+        "--dry-run", action="store_true",
+        help="Validate dependencies, configurations, and generator functions without writing files"
+    )
+    parser.add_argument(
+        "--docs-dir", default=default_docs,
+        help=f"Destination directory for docs datasheets (default: {default_docs})"
+    )
+    parser.add_argument(
+        "--backend-dir", default=default_backend,
+        help=f"Destination directory for backend static datasheets (default: {default_backend})"
+    )
+
+    args = parser.parse_args()
+
     print("=" * 70)
     print("SYNTHETIC DATASHEET GENERATOR — REPORTLAB (PROFESSIONAL ENGLISH)")
     print("=" * 70)
-    
-    # Destination directories
-    dir_docs = "/home/ubuntu/hackday26/docs/datasheets"
-    dir_backend = "/home/ubuntu/hackday26/b2b-backend/apps/backend/static/demo/datasheets"
-    
-    os.makedirs(dir_docs, exist_ok=True)
-    os.makedirs(dir_backend, exist_ok=True)
-    
+
     styles = create_styles()
-    
+
     datasheet_configs = [
         {
             "sku": "CN-DEMO-PLC-DIN-420-MR1",
@@ -824,6 +840,32 @@ def main():
             "desc": "Pt100 Class A 3-wire RTD, 1/2 NPT probe, AISI 316L, no transmitter, no Modbus"
         },
     ]
+
+    if args.dry_run:
+        print("[DRY-RUN] Validating script dependencies and generator configurations...")
+        import reportlab
+        import PIL
+        import charset_normalizer
+        print(f"  ✔ ReportLab: {reportlab.__version__}")
+        print(f"  ✔ Pillow (PIL): {PIL.__version__}")
+        print(f"  ✔ Charset-normalizer: {charset_normalizer.__version__}")
+        print(f"  ✔ Target docs directory: {args.docs_dir}")
+        print(f"  ✔ Target backend directory: {args.backend_dir}")
+
+        for cfg in datasheet_configs:
+            sku = cfg["sku"]
+            modelo = cfg["modelo"]
+            elements = cfg["generator"](styles)
+            print(f"  ✔ Generator for {sku} ({modelo}) produced {len(elements)} flowable elements")
+
+        print("\n[OK] Dry-run complete. All dependencies and generator functions are verified.")
+        return
+
+    dir_docs = args.docs_dir
+    dir_backend = args.backend_dir
+
+    os.makedirs(dir_docs, exist_ok=True)
+    os.makedirs(dir_backend, exist_ok=True)
     
     results = []
     

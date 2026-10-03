@@ -5,6 +5,24 @@ import { generateQuotePdf, GenerateQuotePdfResult } from "../pdf-generator"
 
 describe("Muse PDF Generator Wrapper", () => {
   const generatedFilesToCleanup: string[] = []
+  function resolveProjectRoot(): string {
+    if (process.env.PROJECT_ROOT && fs.existsSync(process.env.PROJECT_ROOT)) {
+      return process.env.PROJECT_ROOT
+    }
+    let curr = __dirname
+    for (let i = 0; i < 8; i++) {
+      if (fs.existsSync(path.join(curr, "scripts", "generate-quote-pdf.py"))) {
+        return curr
+      }
+      const parent = path.dirname(curr)
+      if (parent === curr) break
+      curr = parent
+    }
+    return path.resolve(process.cwd(), "../..")
+  }
+  const PROJECT_ROOT = resolveProjectRoot()
+  const STORAGE_BASE_DIR =
+    process.env.STORAGE_BASE_DIR || path.join(PROJECT_ROOT, "storage")
 
   afterAll(async () => {
     // Cleanup generated test files
@@ -21,7 +39,7 @@ describe("Muse PDF Generator Wrapper", () => {
 
   it("should generate a valid PDF for a priced quote via temp JSON file", async () => {
     const testOpaqueId = `test_priced_${Date.now()}_${crypto.randomBytes(4).toString("hex")}`
-    const expectedFilePath = `/home/ubuntu/hackday26/storage/quotes/${testOpaqueId}.pdf`
+    const expectedFilePath = path.join(STORAGE_BASE_DIR, "quotes", `${testOpaqueId}.pdf`)
     generatedFilesToCleanup.push(expectedFilePath)
 
     const quoteData = {
@@ -66,7 +84,7 @@ describe("Muse PDF Generator Wrapper", () => {
 
   it("should generate a valid PDF for a manual_review quote without prices", async () => {
     const testOpaqueId = `test_manual_${Date.now()}_${crypto.randomBytes(4).toString("hex")}`
-    const expectedFilePath = `/home/ubuntu/hackday26/storage/quotes/${testOpaqueId}.pdf`
+    const expectedFilePath = path.join(STORAGE_BASE_DIR, "quotes", `${testOpaqueId}.pdf`)
     generatedFilesToCleanup.push(expectedFilePath)
 
     const quoteData = {
@@ -97,7 +115,7 @@ describe("Muse PDF Generator Wrapper", () => {
 
   it("should support generating PDF via stdin option", async () => {
     const testOpaqueId = `test_stdin_${Date.now()}_${crypto.randomBytes(4).toString("hex")}`
-    const expectedFilePath = `/home/ubuntu/hackday26/storage/quotes/${testOpaqueId}.pdf`
+    const expectedFilePath = path.join(STORAGE_BASE_DIR, "quotes", `${testOpaqueId}.pdf`)
     generatedFilesToCleanup.push(expectedFilePath)
 
     const quoteData = {

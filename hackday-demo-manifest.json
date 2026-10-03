@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-29T21:36:36.750Z",
+  "generated_at": "2026-10-03T20:42:05.857Z",
   "region": {
     "id": "reg_01JUS00HACKDAY26DEMOUSD0000",
     "name": "United States",
@@ -7,23 +7,23 @@
   },
   "sales_channels": [
     {
-      "id": "sc_01M3Q5VTQG6ZW1VX3TVVD0RM1B",
+      "id": "sc_01M41QW0BDTFNCN8SHAM6M7QZ8",
       "name": "Default Sales Channel"
     },
     {
-      "id": "sc_01M3Q6KV0ZKB73YRM3YYBJZFGB",
+      "id": "sc_01M41R18FY6GY5PTBYKW9SYKMN",
       "name": "Demo Sales Channel"
     }
   ],
   "stock_location": {
-    "id": "sloc_01M3Q5VTXYB552BSCQY58WFNFM"
+    "id": "sloc_01M41QW0F8JYRHS42SY3Q33R28"
   },
   "products": {
     "CN-X5PRIME-HE-XP5": {
       "sku": "CN-X5PRIME-HE-XP5",
       "model": "HE-XP5",
-      "product_id": "prod_01M3QHJ7RT29Z0TZ8DNVF3MYVQ",
-      "variant_id": "variant_01M3QHJ7VWN2PPPJFV0AQZZXZS",
+      "product_id": "prod_01M41R18HHV1C37JKN503W2ASP",
+      "variant_id": "variant_01M41R18MQK0GXGPTYSX0EDZBH",
       "handle": "cn-x5prime-he-xp5",
       "urls": {
         "pdf_datasheet": "https://data.controlnautas.com/demo/datasheets/CN-X5PRIME-HE-XP5.pdf",
@@ -37,8 +37,8 @@
     "CN-N1200": {
       "sku": "CN-N1200",
       "model": "N1200",
-      "product_id": "prod_01M3QHJ81Q8P7CYM825H2CQ2YK",
-      "variant_id": "variant_01M3QHJ84595VBY5TA4ZWNPX9Z",
+      "product_id": "prod_01M41R18VMMN7C4V7973CRTAGR",
+      "variant_id": "variant_01M41R18XQ6QNWMX8Z39NMR2NW",
       "handle": "cn-n1200",
       "urls": {
         "pdf_datasheet": "https://data.controlnautas.com/demo/datasheets/CN-N1200.pdf",
@@ -52,8 +52,8 @@
     "CN-THT02": {
       "sku": "CN-THT02",
       "model": "THT-02",
-      "product_id": "prod_01M3QHJ87T8A20RV7XRBX4KA79",
-      "variant_id": "variant_01M3QHJ89GNM03V7HK1TVG4YPG",
+      "product_id": "prod_01M41R191T79EJVV5TNEN6TAWD",
+      "variant_id": "variant_01M41R193J5MPJ16MTX9CAWWRM",
       "handle": "cn-tht02",
       "urls": {
         "pdf_datasheet": "https://data.controlnautas.com/demo/datasheets/CN-THT02.pdf",
@@ -68,8 +68,8 @@
   "CN-X5PRIME-HE-XP5": {
     "sku": "CN-X5PRIME-HE-XP5",
     "model": "HE-XP5",
-    "product_id": "prod_01M3QHJ7RT29Z0TZ8DNVF3MYVQ",
-    "variant_id": "variant_01M3QHJ7VWN2PPPJFV0AQZZXZS",
+    "product_id": "prod_01M41R18HHV1C37JKN503W2ASP",
+    "variant_id": "variant_01M41R18MQK0GXGPTYSX0EDZBH",
     "handle": "cn-x5prime-he-xp5",
     "urls": {
       "pdf_datasheet": "https://data.controlnautas.com/demo/datasheets/CN-X5PRIME-HE-XP5.pdf",
@@ -83,8 +83,8 @@
   "CN-N1200": {
     "sku": "CN-N1200",
     "model": "N1200",
-    "product_id": "prod_01M3QHJ81Q8P7CYM825H2CQ2YK",
-    "variant_id": "variant_01M3QHJ84595VBY5TA4ZWNPX9Z",
+    "product_id": "prod_01M41R18VMMN7C4V7973CRTAGR",
+    "variant_id": "variant_01M41R18XQ6QNWMX8Z39NMR2NW",
     "handle": "cn-n1200",
     "urls": {
       "pdf_datasheet": "https://data.controlnautas.com/demo/datasheets/CN-N1200.pdf",
@@ -98,8 +98,8 @@
   "CN-THT02": {
     "sku": "CN-THT02",
     "model": "THT-02",
-    "product_id": "prod_01M3QHJ87T8A20RV7XRBX4KA79",
-    "variant_id": "variant_01M3QHJ89GNM03V7HK1TVG4YPG",
+    "product_id": "prod_01M41R191T79EJVV5TNEN6TAWD",
+    "variant_id": "variant_01M41R193J5MPJ16MTX9CAWWRM",
     "handle": "cn-tht02",
     "urls": {
       "pdf_datasheet": "https://data.controlnautas.com/demo/datasheets/CN-THT02.pdf",

@@ -2,6 +2,30 @@ import { loadEnv, defineConfig } from '@medusajs/framework/utils'
 
 loadEnv(process.env.NODE_ENV || 'development', process.cwd())
 
+const isProduction = process.env.NODE_ENV === "production"
+const isBuildCommand = process.argv.some((arg) => arg.includes("build"))
+
+if (isProduction && !isBuildCommand) {
+  const missingSecrets: string[] = []
+  if (!process.env.DATABASE_URL?.trim()) {
+    missingSecrets.push("DATABASE_URL")
+  }
+  if (!process.env.JWT_SECRET?.trim() || process.env.JWT_SECRET === "supersecret") {
+    missingSecrets.push("JWT_SECRET (must be configured and non-default)")
+  }
+  if (!process.env.COOKIE_SECRET?.trim() || process.env.COOKIE_SECRET === "supersecret") {
+    missingSecrets.push("COOKIE_SECRET (must be configured and non-default)")
+  }
+
+  if (missingSecrets.length > 0) {
+    throw new Error(
+      `[FATAL] Missing required production secrets: ${missingSecrets.join(
+        ", "
+      )}. Refusing to boot.`
+    )
+  }
+}
+
 const REQUIRED_CORS_ORIGINS = [
   "https://data.controlnautas.com",
   "https://www.data.controlnautas.com",

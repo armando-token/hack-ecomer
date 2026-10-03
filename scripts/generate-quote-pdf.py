@@ -902,7 +902,8 @@ def run_worker():
                 raise ValueError("JSON object expected for 'data'")
             if not output_target:
                 opaque_id = quote_data.get("opaque_public_id") or quote_data.get("quote_id") or "simulated_quote"
-                output_target = f"/home/ubuntu/hackday26/storage/quotes/{opaque_id}.pdf"
+                storage_base = os.environ.get("STORAGE_BASE_DIR") or os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "storage")
+                output_target = os.path.join(storage_base, "quotes", f"{opaque_id}.pdf")
             generated_path = generate_quote_pdf(quote_data, output_target)
             file_size = os.path.getsize(generated_path)
             res = json.dumps({"ok": True, "path": generated_path, "size": file_size})
@@ -974,7 +975,8 @@ def main():
     output_target = args.output_flag or args.output_pos
     if not output_target:
         opaque_id = quote_data.get("opaque_public_id") or quote_data.get("quote_id") or "simulated_quote"
-        output_target = f"/home/ubuntu/hackday26/storage/quotes/{opaque_id}.pdf"
+        storage_base = os.environ.get("STORAGE_BASE_DIR") or os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "storage")
+        output_target = os.path.join(storage_base, "quotes", f"{opaque_id}.pdf")
 
     try:
         generated_path = generate_quote_pdf(quote_data, output_target)

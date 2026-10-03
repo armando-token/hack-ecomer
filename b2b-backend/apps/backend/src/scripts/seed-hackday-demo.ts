@@ -46,6 +46,24 @@ function getDatasheetChecksum(pdfPath: string, fallback: string): string {
   return fallback
 }
 
+function resolveProjectRoot(): string {
+  if (process.env.PROJECT_ROOT && fs.existsSync(process.env.PROJECT_ROOT)) {
+    return process.env.PROJECT_ROOT
+  }
+  let curr = __dirname
+  for (let i = 0; i < 8; i++) {
+    if (fs.existsSync(path.join(curr, "hackday-demo-manifest.json"))) {
+      return curr
+    }
+    const parent = path.dirname(curr)
+    if (parent === curr) break
+    curr = parent
+  }
+  return path.resolve(process.cwd(), "../../..")
+}
+
+const PROJECT_ROOT = resolveProjectRoot()
+
 const DEMO_SOURCES = [
   {
     id: "SRC-HE-XP5-DS-MAN1363-R21",
@@ -53,7 +71,7 @@ const DEMO_SOURCES = [
     kind: "datasheet",
     revision: "MAN1363-R21",
     checksum: getDatasheetChecksum(
-      "/home/ubuntu/hackday26/docs/datasheets/CN-X5PRIME-HE-XP5.pdf",
+      path.join(PROJECT_ROOT, "docs/datasheets/CN-X5PRIME-HE-XP5.pdf"),
       "70278736e6b8f3ab170876274a02a3ba7be0942bc2b0995bf7d5742f8bd1d742"
     ),
     published_at: "2023-07-24T00:00:00Z",
@@ -64,7 +82,7 @@ const DEMO_SOURCES = [
     kind: "datasheet",
     revision: "UG-V2.0xQ-EN",
     checksum: getDatasheetChecksum(
-      "/home/ubuntu/hackday26/docs/datasheets/CN-N1200.pdf",
+      path.join(PROJECT_ROOT, "docs/datasheets/CN-N1200.pdf"),
       "53384720600d70cdce641350c30b0b86ad5e44a8b37291dbaef8ee0852f86554"
     ),
     published_at: "2024-01-01T00:00:00Z",
@@ -75,7 +93,7 @@ const DEMO_SOURCES = [
     kind: "datasheet",
     revision: "UM-V1.1",
     checksum: getDatasheetChecksum(
-      "/home/ubuntu/hackday26/docs/datasheets/CN-THT02.pdf",
+      path.join(PROJECT_ROOT, "docs/datasheets/CN-THT02.pdf"),
       "48718e71596413492f2a871e520c1567e6fe1e8abe05b89822a0f21e091e6a7c"
     ),
     published_at: "2024-01-01T00:00:00Z",
@@ -1085,7 +1103,7 @@ export default async function seedHackdayDemo({ container }: ExecArgs) {
     // -----------------------------------------------------------------------
     // 7. GENERACIÓN DEL MANIFIESTO JSON
     // -----------------------------------------------------------------------
-    const manifestPath = path.resolve("/home/ubuntu/hackday26/hackday-demo-manifest.json")
+    const manifestPath = path.join(PROJECT_ROOT, "hackday-demo-manifest.json")
     const manifestPayload = {
       generated_at: new Date().toISOString(),
       region: {
