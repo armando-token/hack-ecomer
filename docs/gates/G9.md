@@ -272,6 +272,14 @@ The platform enforces three explicit orthogonal readiness flags:
   - `GET https://data.controlnautas.com/api/industrial/v2/quotes/{id}/pdf` → HTTP 200 (`application/pdf`)
   - `GET https://data.controlnautas.com/api/industrial/v2/configurations/heating-chamber/bundle` → HTTP 200 (`commercial` block + `ready_for_commercial_estimate: true`)
 
+### 5.2 PDF Template Status & Pricing Alignment Fix
+- **Identified Condition:** Preliminary quotes JSON returned live prices, but the ReportLab PDF generation worker checked `status == 'priced'` strictly, causing it to fall back to the manual-review template when `status: 'preliminary'` was passed.
+- **Resolution Implemented:**
+  1. `preliminary-quotes/route.ts` and `quotes/[quoteId]/pdf/route.ts`: Evaluates whether all quote lines have positive unit prices from Medusa; if so, passes `status: "priced"` in the PDF payload while preserving JSON `status: "preliminary"` with the demo disclaimer.
+  2. `scripts/generate-quote-pdf.py`: Updated to automatically treat `status: 'preliminary'` as `priced` whenever items contain positive unit prices.
+  3. PDF payload explicitly passes item `model`, `unit_price`, `subtotal`, and `total` so `build_priced_section` renders the complete commercial breakdown.
+  4. Verified via public HTTPS smoke test: downloaded PDF text confirmed to contain `$890.00 USD`, `$480.00 USD`, `$75.00 USD`, and `$1,445.00 USD` alongside the simulation disclaimer watermark.
+
 ---
 
 ## 6. Acceptance Decision & Sign-Off

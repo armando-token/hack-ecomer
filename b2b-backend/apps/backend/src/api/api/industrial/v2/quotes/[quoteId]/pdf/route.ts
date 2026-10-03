@@ -86,11 +86,23 @@ export async function GET(req: MedusaRequest, res: MedusaResponse): Promise<any>
 
   if (!resolvedPath && quote.items && quote.items.length > 0) {
     try {
+      const allPriced =
+        quote.items.length > 0 &&
+        quote.items.every(
+          (it) =>
+            ((it as any).unit_price_cents || 0) > 0 ||
+            ((it as any).unit_price_usd || 0) > 0
+        )
+      const pdfStatus = allPriced ? "priced" : (quote.status === "priced" ? "priced" : "manual_review")
+
       const regenerated = await generateQuotePdf({
         quote_id: quote.quote_id,
+        id: quote.quote_id,
         opaque_public_id: quote.opaque_public_id,
-        status: quote.status,
-        currency: quote.currency,
+        status: pdfStatus,
+        currency: quote.currency || "USD",
+        subtotal: quote.total_usd,
+        subtotal_amount: quote.total_usd,
         total: quote.total_usd,
         total_amount: quote.total_usd,
         total_cents: quote.total_cents,
@@ -98,11 +110,14 @@ export async function GET(req: MedusaRequest, res: MedusaResponse): Promise<any>
         expires_at: quote.expires_at,
         items: quote.items.map((it) => ({
           sku: it.sku,
+          model: (it as any).model || it.sku,
           title: it.title,
           quantity: it.quantity,
           currency: "USD",
           unit_price: it.unit_price_usd,
+          unit_price_minor: it.unit_price_cents,
           subtotal: it.subtotal_usd,
+          subtotal_minor: it.subtotal_cents,
           availability_status: it.availability_status,
         })),
         disclaimer: quote.disclaimer,

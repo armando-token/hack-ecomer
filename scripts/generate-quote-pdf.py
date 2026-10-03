@@ -809,6 +809,12 @@ def generate_quote_pdf(quote_data: Dict[str, Any], output_path: str) -> str:
     quote_id = quote_data.get('quote_id') or quote_data.get('id') or 'QUOTE-DEMO-000000'
     opaque_id = quote_data.get('opaque_public_id') or quote_id
     status = str(quote_data.get('status', 'priced')).strip().lower()
+    items = extract_items(quote_data)
+    has_prices = items and any(it.get('unit_price') is not None and float(it.get('unit_price', 0)) > 0 for it in items)
+    if (status == 'preliminary' or not status) and has_prices:
+        status = 'priced'
+        quote_data['status'] = 'priced'
+
     currency = str(quote_data.get('currency', 'USD')).upper()
     if not currency or currency in ('PEN', 'SOL', 'SOLES'):
         currency = 'USD'
@@ -854,7 +860,6 @@ def generate_quote_pdf(quote_data: Dict[str, Any], output_path: str) -> str:
     story.append(Paragraph("1. Technical Item Details", styles['sec_heading']))
     story.append(Spacer(1, 2))
 
-    items = extract_items(quote_data)
     if status == 'priced':
         story.extend(build_priced_section(styles, quote_data, items, currency))
     else:

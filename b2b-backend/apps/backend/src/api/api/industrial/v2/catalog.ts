@@ -13,6 +13,7 @@ import type { TechnicalSnapshot } from "../../../../modules/industrial-config/sc
 
 export interface ProductCatalogMeta {
   title: string
+  model?: string
   role: string
   handle: string
   technical_summary: string
@@ -53,6 +54,7 @@ const BASE_STOREFRONT_URL = "https://data.controlnautas.com"
 const PRODUCT_METADATA: Record<string, ProductCatalogMeta> = {
   "CN-X5PRIME-HE-XP5": {
     title: "X5 Prime OCS All-in-One Controller (HE-XP5)",
+    model: "HE-XP5",
     role: "controller",
     handle: "cn-x5prime-he-xp5",
     technical_summary: "Horner Automation OCS, built-in I/O, 10–30 VDC primary power",
@@ -60,6 +62,7 @@ const PRODUCT_METADATA: Record<string, ProductCatalogMeta> = {
   },
   "CN-N1200": {
     title: "NOVUS N1200 Universal Process & Temperature Controller",
+    model: "N1200",
     role: "controller",
     handle: "cn-n1200",
     technical_summary: "Universal process PID controller, fast sampling, universal input and analog/relay outputs",
@@ -67,6 +70,7 @@ const PRODUCT_METADATA: Record<string, ProductCatalogMeta> = {
   },
   "CN-THT02": {
     title: "TZ THT-02 Temperature and Humidity Sensor (RS-485 Modbus RTU)",
+    model: "THT-02",
     role: "sensor",
     handle: "cn-tht02",
     technical_summary: "SHT30 sensing, RS-485 Modbus RTU, DC 5–24 V supply",
